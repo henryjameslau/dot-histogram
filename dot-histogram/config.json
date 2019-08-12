@@ -1,0 +1,20 @@
+{
+  "essential": {
+    "graphic_data_url": "data.csv",
+    "colour_palette": ["#36ADD9", "#BBBDBF", "#BBBDBF", "#BBBDBF", "#BBBDBF", "#BBBDBF"],
+    "sourceText": ["Office for National Statistics"]
+  },
+
+  "optional": {
+    "margin_sm": [80, 10, 70, 30],
+    "margin_md": [50, 10, 70, 30],
+    "margin_lg": [50, 10, 70, 30],
+
+    "aspectRatio_sm": [16, 13],
+    "aspectRatio_md": [16, 12],
+    "aspectRatio_lg": [16, 10],
+
+    "mediumBreakpoint": 576,
+    "mobileBreakpoint": 414
+  }
+}
