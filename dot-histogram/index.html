@@ -12,7 +12,6 @@
 
   <link rel="stylesheet" href="../lib/globalStyle.css" />
   <link rel="stylesheet" href="../lib/bootstrap-grid.css" />
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
 
   <style type="text/css">
     h6 {
@@ -21,6 +20,18 @@
       font-weight: 700;
       color: #323132;
     }
+
+    g.annotation.Male g.annotation-subject path.subject{
+      fill:blue;
+      fill-opacity:1;
+    }
+
+    g.annotation.Female g.annotation-subject path.subject{
+      fill:darkgrey;
+      fill-opacity:1;
+
+    }
+
   </style>
 
 </head>
@@ -28,11 +39,9 @@
 
 <body>
 
-  <div class="container-fluid">
     <div id="graphic" class="row no-gutters">
       <img src="fallback.png" alt="[Chart]" />
     </div>
-  </div>
 
   <button type="button">Look at income</button>
   <h6 id="source">Source: Office for National Statistics</h6>
@@ -210,6 +219,8 @@
         .attr('transform', 'translate(0,' + height + ')')
         .call(xAxis)
 
+        //use data entered by user, then map it to make the annotations array, use the gender to assign a class so you can style it and put it the right side of the line.
+
 
       annotations = [{
         note: {
@@ -217,9 +228,10 @@
           title: "You"
         },
         x:x(0),
-        y:height/2+radius,
+        y:height/2,
         dy: 20,
         dx: 20,
+        className:"Female",
         subject: {
           radius: 2*radius,
           radiusPadding: 0
