@@ -34,7 +34,8 @@
     </div>
   </div>
 
-  <h6 id="source"></h6>
+  <button type="button">Look at income</button>
+  <h6 id="source">Source: Office for National Statistics</h6>
 
   <script src="../lib/modernizr.svg.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/d3/4.13.0/d3.min.js" type="text/javascript"></script>
@@ -133,87 +134,112 @@
         return {
           gender: d.Gender,
           age: d.Age,
-          values: thisHisto(d.values),
+          values: thisHisto(d.values).filter(function(d) {
+            return d.length > 0
+          }),
           no: d.values.length
         }
       })
-      console.log(histos)
+      // console.log(histos)
       var xAxis = d3.axisBottom(x);
 
-      var sides = svg.selectAll(".sides")
+      histos.forEach(function(d) {
+        var dummy = [];
+        d.values.forEach(function(p, i) {
+          p.forEach(function(q, j) {
+            dummy.push({
+              gender: d.gender,
+              age: d.age,
+              x: p.x0,
+              idx: j
+            })
+          })
+        })
+        d.circles = dummy;
+      })
+
+      console.log(histos)
+
+      sides = svg.selectAll(".sides")
         .data(histos)
         .enter()
         .append('g')
+        .attr('class', 'sides')
         .attr('id', function(d) {
           return d.gender
         })
+        .attr('transform', 'translate(0,' + height / 2 + ')')
 
       var radius = x(1) - x(0.5)
 
-
       sides.selectAll('circle')
-        .data(function(d){return d.values.map(function(p,i){
-              return {gender:d.gender,age:d.age,x:p.x0,idx:i}
-          })
+        .data(function(d) {
+          return d.circles
         })
         .enter()
         .append('circle')
-        .attr('cx',function(d){console.log(d);return x(d.x)})
-        .attr('cy',function(d){return -d.idx * 2 * radius - radius})
-        .attr('r', x(1) - x(0.6))
-        .attr('fill', "blue")
-
-
-      // var bins = sides.selectAll('.bins')
-      //   .data(function(d) {
-      //     console.log(d)
-      //     return d.values
-      //   })
-      //   .enter()
-      //   .append('g')
-      //   .attr('class', 'bins')
-      //   .attr('transform', function(d) {
-      //     return 'translate(' + x(d.x0) + ',' + height / 2 + ')'
-      //   })
-
-
-      // var binsMale = svg.selectAll('.bins')
-      //   .data(maleDotHisto)
-      //   .enter()
-      //   .append('g')
-      //   .attr('class','bins')
-      //   .attr('transform',function(d){return 'translate('+x(d.x0)+','+height/2+')'})
-      //
-      //
-      // bins.selectAll('circle')
-      //   .data(function(d) {
-      //     // console.log(d)
-      //     return d.map(function(p, i) {
-      //       return {
-      //         data:p,
-      //         idx: i
-      //       }
-      //     })
-      //   })
-      //   .enter()
-      //   .append('circle')
-      //   .attr('cx', 0)
-      //   .attr('cy', function(d) {
-      //     // console.log(d);
-      //     return -d.idx * 2 * radius - radius
-      //   })
-      //   .attr('r', x(1) - x(0.6))
-      //   .attr('fill', "blue")
-
-      // var binsFemale = svg.selectAll('.bins')
-      //     .data()
+        .attr('cy', function(d) {
+          if (d.gender === "Male") {
+            return -d.idx * 2 * radius - radius
+          } else if (d.gender === "Female") {
+            return +d.idx * 2 * radius + radius
+          }
+        })
+        .attr('r', x(1) - x(0.55))
+        .attr('fill', function(d) {
+          if (d.gender === "Male") {
+            return "blue"
+          } else if (d.gender === "Female") {
+            return "red"
+          }
+        })
+        .transition()
+        .duration(function(d) {
+          return d.x * 40
+        })
+        .ease(d3.easeSin)
+        .attr('cx', function(d) {
+          return x(d.x)
+        })
 
       svg.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + height + ')')
         .call(xAxis)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      d3.select('button').on('click', function() {
+        byIncome()
+      })
+
+      function byIncome() {
+        console.log('Income button')
+        sides.selectAll('circle')
+          .transition()
+          .attr('cx', x(40))
+          .transition()
+          .delay(500)
+          .attr('cy', -height / 2)
+
+
+      }
+
     } // ends drawGraphic
+
+
 
     function createDistribution(data) {
       var dummy = []
