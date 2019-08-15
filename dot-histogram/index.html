@@ -322,11 +322,13 @@
         console.log(myDistribution)
 
         var incomeXMax = d3.max([myIncomeData[0]["D10"],myIncomeData[1]["D10"]])
-        x.domain([0,incomeXMax]).nice()
 
+        x.range([0,0])
+        d3.select('.x').transition().duration(750).call(d3.axisBottom(x))
 
-
-        d3.select('.x').transition().call(d3.axisBottom(x))
+        x.range([0,chart_width])
+        .domain([0,incomeXMax]).nice()
+        d3.select('.x').transition().delay(750).duration(750).call(d3.axisBottom(x))
 
         var histos = myDistribution.map(function(d) {
           var thisHisto = d3.histogram()
