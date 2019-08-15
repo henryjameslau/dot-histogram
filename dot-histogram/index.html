@@ -38,18 +38,33 @@
 
 
 <body>
+    Sex:
+    <select id="gender" name="gender">
+     <option value="Male">Male</option>
+     <option value="Female" selected>Female</option>
+   </select>
+   Age
+   <input id='age' type="number" name="age" value="20" min="18" max="70">
+   Commute time (mins)
+   <input type="number" id="commuteTime" name="commuteTime"
+       value="22" min="00" max="120">
+   Income per hour £
+   <input id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
+
+ <button id="startButton" type="button">Start</button>
 
     <div id="graphic" class="row no-gutters">
       <img src="fallback.png" alt="[Chart]" />
     </div>
 
-  <button type="button">Look at income</button>
+  <button id="incomeButton" type="button">Look at income</button>
   <h6 id="source">Source: Office for National Statistics</h6>
 
   <script src="../lib/modernizr.svg.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/d3/4.13.0/d3.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.js" type="text/javascript"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
 
   <script>
     var graphic = d3.select('#graphic');
@@ -57,6 +72,12 @@
     var pymChild = null;
 
     function drawGraphic(width) {
+
+      //grab values
+      gender = document.getElementById('gender').value
+      age = +document.getElementById('age').value
+      commuteTime = +document.getElementById('commuteTime').value
+      income = +document.getElementById('income').value
       // clear out existing graphics
       graphic.selectAll("*").remove();
       source.selectAll("*").remove();
@@ -98,7 +119,7 @@
         .append("g")
         .attr("id", "legend");
 
-      var svg = graphic.select('svg')
+      svg = graphic.select('svg')
         .attr("id", "chart")
         .style("background-color", "#fff")
         .attr("width", chart_width + margin.left + margin.right)
@@ -106,184 +127,287 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var x = d3.scaleLinear()
+      x = d3.scaleLinear()
         .rangeRound([0, chart_width]);
 
       const range = (from, to, step) =>
         Array(~~((to - from) / step) + 1) // '~~' is Alternative for Math.floor()
         .fill().map((v, i) => from + i * step);
 
-      console.log("graphic_data", graphic_data)
-
-      myAgeData = graphic_data.filter(function(d) {
-        return +d.Age === 20
-      })
-
-      console.log('myAgeData', myAgeData)
-      var myDistribution = createDistribution(myAgeData)
-      console.log('myDistribution', myDistribution)
-
-      xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
-      x.domain([0, xMax]).nice();
-
-      var histogram = d3.histogram()
-        .value(function(d) {
-          return d
-        })
-        .domain(x.domain())
-        .thresholds(range(x.domain()[0], x.domain()[1], 1))
-
-      var histos = myDistribution.map(function(d) {
-        var thisHisto = d3.histogram()
-          .value(function(d) {
-            return d
-          })
-          .domain(x.domain())
-          .thresholds(range(x.domain()[0], x.domain()[1], 1))
-
-        return {
-          gender: d.Gender,
-          age: d.Age,
-          values: thisHisto(d.values).filter(function(d) {
-            return d.length > 0
-          }),
-          no: d.values.length
-        }
-      })
-      // console.log(histos)
-      var xAxis = d3.axisBottom(x);
-
-      histos.forEach(function(d) {
-        var dummy = [];
-        d.values.forEach(function(p, i) {
-          p.forEach(function(q, j) {
-            dummy.push({
-              gender: d.gender,
-              age: d.age,
-              x: p.x0,
-              idx: j
-            })
-          })
-        })
-        d.circles = dummy;
-      })
-
-      console.log(histos)
-
-      sides = svg.selectAll(".sides")
-        .data(histos)
-        .enter()
-        .append('g')
-        .attr('class', 'sides')
-        .attr('id', function(d) {
-          return d.gender
-        })
-        .attr('transform', 'translate(0,' + height / 2 + ')')
-
-      var radius = x(1) - x(0.5)
-
-      sides.selectAll('circle')
-        .data(function(d) {
-          return d.circles
-        })
-        .enter()
-        .append('circle')
-        .attr('cy', function(d) {
-          if (d.gender === "Male") {
-            return -d.idx * 2 * radius - radius
-          } else if (d.gender === "Female") {
-            return +d.idx * 2 * radius + radius
-          }
-        })
-        .attr('r', x(1) - x(0.55))
-        .attr('fill', function(d) {
-          if (d.gender === "Male") {
-            return "blue"
-          } else if (d.gender === "Female") {
-            return "red"
-          }
-        })
-        .transition()
-        .duration(function(d) {
-          return d.x * 40
-        })
-        .ease(d3.easeSin)
-        .attr('cx', function(d) {
-          return x(d.x)
-        })
-
-
-
-      svg.append('g')
-        .attr('class', 'x axis')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(xAxis)
-
-        //use data entered by user, then map it to make the annotations array, use the gender to assign a class so you can style it and put it the right side of the line.
-
-
-      annotations = [{
-        note: {
-          label: "00:00",
-          title: "You"
-        },
-        x:x(0),
-        y:height/2,
-        dy: 20,
-        dx: 20,
-        className:"Female",
-        subject: {
-          radius: 2*radius,
-          radiusPadding: 0
-        },
-        type:d3.annotationCalloutCircle
-      }]
-
-
-
-      makeAnnotations = d3.annotation()
-        .annotations(annotations)
-
-      svg.append('g')
-        .attr('class', 'annotation-group')
-        .call(makeAnnotations)
-
-      d3.select('.annotation-group')
-      .transition()
-      .duration(70*40)
-      .ease(d3.easeSin)
-      .tween('updateAnno',function(d){
-        xTrans = d3.interpolateNumber(0,70)
-        timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"),new Date(new Date("January 01, 2019 00:00:00").getTime()+70*60000))
-
-        return function(t){
-          annotations[0].x = x(xTrans(t));
-          annotations[0].note.label = d3.timeFormat("%H:%M")(timeTrans(t))
-          makeAnnotations.annotations(annotations)
-          makeAnnotations.update()
-        }
-      })
-
-
-
-
-
-
-      d3.select('button').on('click', function() {
+      //set up functions on buttons
+      d3.select('#incomeButton').on('click', function() {
         byIncome()
       })
+
+      d3.select('#startButton').on('click', function() {
+        byAge(age,gender)
+        console.log('startButton')
+      })
+
+      function byAge(age,gender){
+        myAgeData = graphic_data.filter(function(d) {
+          return +d.Age === +age
+        })
+
+        console.log('myAgeData', myAgeData)
+        var myDistribution = createDistribution(myAgeData)
+        console.log('myDistribution', myDistribution)
+
+        xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
+        x.domain([0, xMax]).nice();
+
+        var histos = myDistribution.map(function(d) {
+          var thisHisto = d3.histogram()
+            .value(function(d) {
+              return d
+            })
+            .domain(x.domain())
+            .thresholds(range(x.domain()[0], x.domain()[1], 1))
+
+          return {
+            gender: d.Gender,
+            age: d.Age,
+            values: thisHisto(d.values).filter(function(d) {
+              return d.length > 0
+            }),
+            no: d.values.length
+          }
+        })
+        // console.log(histos)
+        xAxis = d3.axisBottom(x);
+
+        histos.forEach(function(d) {
+          var dummy = [];
+          d.values.forEach(function(p, i) {
+            p.forEach(function(q, j) {
+              dummy.push({
+                gender: d.gender,
+                age: d.age,
+                x: p.x0,
+                idx: j
+              })
+            })
+          })
+          d.circles = dummy;
+        })
+
+        console.log('histos',histos)
+
+        sides = svg.selectAll(".sides")
+          .data(histos)
+          .enter()
+          .append('g')
+          .attr('class', 'sides')
+          .attr('id', function(d) {
+            return d.gender
+          })
+          .attr('transform', 'translate(0,' + height / 2 + ')')
+
+        var radius = x(1) - x(0.5)
+
+        sides.selectAll('circle')
+          .data(function(d) {
+            return d.circles
+          })
+          .enter()
+          .append('circle')
+
+          .attr('r', x(1) - x(0.55))
+          .attr('fill', function(d) {
+            if (d.gender === "Male") {
+              return "blue"
+            } else if (d.gender === "Female") {
+              return "red"
+            }
+          })
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(function(d) {
+            return d.x * 40
+          })
+          .attr('cx', function(d) {
+            return x(d.x)
+          })
+          .attr('cy', function(d) {
+            if (d.gender === "Male") {
+              return -d.idx * 2 * radius - radius
+            } else if (d.gender === "Female") {
+              return +d.idx * 2 * radius + radius
+            }
+          })
+
+          svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + height + ')')
+            .call(xAxis)
+
+            //use data entered by user, then map it to make the annotations array, use the gender to assign a class so you can style it and put it the right side of the line.
+
+
+          annotations = [{
+            note: {
+              label: "00:00",
+              title: "You"
+            },
+            x:x(0),
+            y:height/2,
+            dy: 20,
+            dx: 20,
+            className:gender,
+            subject: {
+              radius: 2*radius,
+              radiusPadding: 0
+            },
+            type:d3.annotationCalloutCircle
+          }]
+
+
+
+          makeAnnotations = d3.annotation()
+            .annotations(annotations)
+
+          svg.append('g')
+            .attr('class', 'annotation-group')
+            .call(makeAnnotations)
+
+
+          d3.transition()
+          .duration(commuteTime*40)
+          .ease(d3.easeLinear)
+          .tween('updateAnno',function(d){
+            xTrans = d3.interpolateNumber(0,commuteTime)
+            timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"),new Date(new Date("January 01, 2019 00:00:00").getTime()+commuteTime*60000))
+
+            return function(t){
+              annotations[0].x = x(xTrans(t));
+              annotations[0].note.label = d3.timeFormat("%H:%M")(timeTrans(t))
+              makeAnnotations.annotations(annotations)
+              makeAnnotations.update()
+            }
+          })
+
+
+      }//end of byAge
+
 
       function byIncome() {
         console.log('Income button')
         sides.selectAll('circle')
           .transition()
-          .attr('cx', x(40))
+          .attr('cx', x(commuteTime))
           .transition()
           .delay(500)
           .attr('cy', -height / 2)
 
+        d3.transition()
+        .delay(750)
+        .tween('updateAnno',function(d){
+          yTrans = d3.interpolateNumber(height/2,0)
 
-      }
+          return function(t){
+            annotations[0].y = yTrans(t);
+            annotations[0].note.label = ""
+            makeAnnotations.annotations(annotations)
+            makeAnnotations.update()
+          }
+        })
+
+
+        //find commute time band
+        myIncomeData = income_data.filter(function(d){return +d.commuteMin<= commuteTime && +d.commuteMax > commuteTime})
+        .filter(function(d){return +d.ageMin<= age && +d.ageMax > age})
+
+        console.log(myIncomeData)
+        var myDistribution = createDistribution(myIncomeData)
+        console.log(myDistribution)
+
+        var incomeXMax = d3.max([myIncomeData[0]["D10"],myIncomeData[1]["D10"]])
+        x.domain([0,incomeXMax]).nice()
+
+
+
+        d3.select('.x').transition().call(d3.axisBottom(x))
+
+        var histos = myDistribution.map(function(d) {
+          var thisHisto = d3.histogram()
+            .value(function(d) {
+              return d
+            })
+            .domain(x.domain())
+            .thresholds(range(x.domain()[0], x.domain()[1], incomeXMax/100))
+
+          return {
+            gender: d.Gender,
+            values: thisHisto(d.values).filter(function(d) {
+              return d.length > 0
+            }),
+          }
+        })
+        // console.log(histos)
+        var xAxis = d3.axisBottom(x);
+
+        histos.forEach(function(d) {
+          var dummy = [];
+          d.values.forEach(function(p, i) {
+            p.forEach(function(q, j) {
+              dummy.push({
+                gender: d.gender,
+                x: p.x0,
+                idx: j
+              })
+            })
+          })
+          d.circles = dummy;
+        })
+
+        console.log('histos',histos)
+
+        sides = svg.selectAll(".sides")
+          .data(histos)
+
+        var radius = x(incomeXMax/100)*0.45
+
+        sides.selectAll('circle')
+          .data(function(d) {
+            return d.circles
+          })
+          .transition()
+          .delay(1500)
+          .ease(d3.easeLinear)
+          .duration(1500)
+          .attr('cx', function(d) {
+            return x(d.x)
+          })
+          .attr('r',radius)
+          .attr('cy', function(d) {
+            if (d.gender === "Male") {
+              return -d.idx * 2 * radius - radius
+            } else if (d.gender === "Female") {
+              return +d.idx * 2 * radius + radius
+            }
+          })
+
+        d3.transition()
+        .delay(1500)
+        .duration(1500)
+        .ease(d3.easeLinear)
+        .tween('updateAnno',function(d){
+          var xTrans = d3.interpolateNumber(annotations[0].x,x(income))
+          var yTrans = d3.interpolateNumber(0,height/2)
+          var incomeTrans = d3.interpolateNumber(0,income)
+
+          return function(t){
+            annotations[0].x = xTrans(t);
+            annotations[0].y = yTrans(t)
+            annotations[0].note.label = "£"+d3.format(",.2f")(incomeTrans(t))
+            makeAnnotations.annotations(annotations)
+            makeAnnotations.update()
+          }
+        })
+
+
+
+      } // end by income
 
     } // ends drawGraphic
 
@@ -325,7 +449,6 @@
         })
         dummy.push({
           Gender: d.Sex,
-          Age: d.Age,
           values: filled
         });
       })
@@ -346,6 +469,16 @@
       return res
     }
 
+    function loadData(error,results){
+      if (error) throw error;
+      graphic_data = results[0];
+      income_data = results[1];
+
+      pymChild = new pym.Child({
+        renderCallback: drawGraphic
+      });
+    }
+
     //check whether browser can cope with svg
     if (Modernizr.svg) {
       //load config
@@ -353,14 +486,11 @@
         dvc = config
 
         //load chart data
-        d3.csv(dvc.essential.graphic_data_url, function(error, data) {
-          graphic_data = data;
-
-          //use pym to create iframed chart dependent on specified variables
-          pymChild = new pym.Child({
-            renderCallback: drawGraphic
-          });
-        });
+        q=d3.queue()
+        dvc.essential.graphic_data_url.forEach(function(d){
+          q.defer(d3.csv,d)
+        })
+        q.awaitAll(loadData)
       })
 
     } else {
