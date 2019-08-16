@@ -117,12 +117,12 @@
     }
 
     .btn--select {
-      color: #206095 !important;
-      border: 2px solid #206095 !important;
-      margin-right: 15px !important;
-      margin-bottom: 15px !important;
+      color: #206095;
+      border: 2px solid #206095;
+      margin-right: 15px;
+      margin-bottom: 15px;
       transition: all ease .2s;
-      border-radius: 30px !important;
+      /* border-radius: 30px !important; */
     }
 
     data-toggle="buttons"]>.btn input[type="checkbox"],
@@ -299,15 +299,15 @@
     }
 
     input:focus {
-    outline: 3px solid #FFA23A;
-    z-index: 1;
-    outline-offset: -3px;
+      outline: 3px solid #FFA23A;
+      z-index: 1;
+      outline-offset: -3px;
     }
 
     .borderbox {
       border: 2px solid #1b5f97;
-      height:34px;
-      width:98px;
+      height: 34px;
+      width: 98px;
     }
 
     button:focus {
@@ -327,12 +327,26 @@
     .white {
       color: white;
     }
+
+    .btn--next::after {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      content: "\f054";
+      margin-left: 10px;
+    }
+
+    .btn--primary {
+      background-color: #206095 !important;
+    }
+
   </style>
 
 </head>
 
 
 <body>
+
+  <div id="inputs">
   <legend>Age</legend>
 
   <!-- <input id='age' type="number" name="age" value="20" min="18" max="70"> -->
@@ -350,8 +364,7 @@
 
   <div class="btn btn--select " aria-labelledby="Male">
     <input type="radio" name="gender" value="Male" autocomplete="off" tabindex="0">Male
-  </div>
-  <div class="btn btn--select " tabindex="0" aria-labelledby="Female">
+  </div><div class="btn btn--select " tabindex="0" aria-labelledby="Female">
     <input type="radio" name="gender" value="Female" autocomplete="off" tabindex="0" checked>Female
   </div>
 
@@ -359,15 +372,21 @@
   <legend>Commute time (mins)</legend>
   <div class="borderbox">
 
-  <input class="bold" type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
-</div>
+    <input class="bold" type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
+  </div>
 
   <legend>Income per hour </legend>
   <div class="borderbox">
     £<input class="bold" id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
   </div>
 
-  <button id="startButton" type="button">Start</button>
+
+  <legend></legend>
+
+  <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Start</button>
+
+  </div>
+  <!-- end of inputs -->
 
   <div id="graphic" class="row no-gutters">
     <img src="fallback.png" alt="[Chart]" />
@@ -385,7 +404,7 @@
 
   <script>
     //button group
-    d3.selectAll('.btn').on('click', function(d) {
+    d3.selectAll('.btn--select').on('click', function(d) {
       d3.selectAll('.btn').classed('active', false)
       d3.select(this).classed('active', true)
       d3.selectAll('.btn').selectAll('input').property('checked', false)
