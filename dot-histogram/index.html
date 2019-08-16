@@ -22,64 +22,12 @@
       color: #323132;
     }
 
-    g.annotation.Male g.annotation-subject path.subject {
-      fill: blue;
-      fill-opacity: 1;
-    }
-
-    g.annotation.Female g.annotation-subject path.subject {
+    g.annotation-subject path.subject {
       fill: darkgrey;
       fill-opacity: 1;
 
     }
 
-    /* select  */
-
-    .select select {
-      font-size: 1.1em;
-      border: none;
-      box-shadow: none;
-      border-radius: 0;
-      background: transparent;
-      height: 100%;
-      width: 100%;
-      cursor: pointer;
-      outline: none;
-      padding-right: 35px;
-      padding-left: 15px;
-      border: 2px solid #206095;
-      -moz-appearance: none;
-      -webkit-appearance: none;
-      font-family: "Open Sans", Helvetica, Arial, sans-serif;
-      line-height: inherit;
-      text-transform: none;
-    }
-
-    .select::before {
-      width: 43px;
-      position: absolute;
-      top: 1px;
-      right: 1px;
-      bottom: 1px;
-      background: #206095;
-      content: '';
-      pointer-events: none;
-    }
-
-    .select::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      width: 0;
-      height: 0;
-      right: 14px;
-      bottom: 0;
-      margin: auto;
-      border-style: solid;
-      border-width: 8px 8px 0 8px;
-      border-color: #ffffff transparent transparent transparent;
-      pointer-events: none;
-    }
 
     .btn-group {
       padding: 10px;
@@ -294,7 +242,6 @@
       display: block;
       width: 100%;
       padding: 0;
-      margin-bottom: 20px;
       font-size: 21px;
       line-height: inherit;
       color: #333;
@@ -304,24 +251,18 @@
 
     legend {
       border: 0px;
-      margin: 0 0 20px;
-      margin-top: 0px;
+      margin: 20px 0 10px 0;
     }
-
-    legend {
-      padding: 0;
-    }
-
 
     button#minus.minus,
     button#plus.plus {
-      width: 24px;
-      height: 13px;
+      width: 34px;
+      height: 15px;
       background-color: #1b5f97;
       color: #fff;
       border: 2px solid #1b5f97;
       box-sizing: border-box;
-      font-size: 9.0px;
+      font-size: 13px;
       text-align: center;
       cursor: pointer;
       font-weight: bold;
@@ -338,28 +279,35 @@
         margin-top: 0px;
       }
     }
-/* 
+
     input {
       background: transparent;
       border: none;
     }
 
-    input {
+    input[type=number] {
       border: none;
       border-radius: 0;
-      border: 2px solid #1b5f97;
-      font-size: 18px;
-      line-height: 27px;
-      width: 55px;
-      margin: 16px 0;
-      padding: 6px 0 0 0;
+      /* border: 2px solid #1b5f97; */
+      font-size: 20px;
+      line-height: 20px;
+      /* width: 55px; */
+      /* margin: 16px 0; */
+      padding: 6px 0 6px 0;
       width: 60px;
       text-align: center;
-    } */
+    }
+
+    input:focus {
+    outline: 3px solid #FFA23A;
+    z-index: 1;
+    outline-offset: -3px;
+    }
 
     .borderbox {
       border: 2px solid #1b5f97;
-
+      height:34px;
+      width:98px;
     }
 
     button:focus {
@@ -389,15 +337,13 @@
 
   <!-- <input id='age' type="number" name="age" value="20" min="18" max="70"> -->
 
-  <span class="borderbox">
+  <div class="borderbox">
     <span style="display:inline-block; text-align: center;">
       <input class="bold" id="age" type="number" value="20" max="70" min="18">
-    </span>
-    <span style="display:inline-block;vertical-align:top;">
+    </span><span style="display:inline-block;vertical-align:top;">
       <button type="button" id="plus" class="plus"><i class="fas fa-caret-up white"></i></button>
       <button type="button" id="minus" class="minus"><i class="fas fa-caret-down white"></i></button>
-    </span>
-  </span>
+    </span></div>
 
 
   <legend>Sex</legend>
@@ -411,10 +357,15 @@
 
 
   <legend>Commute time (mins)</legend>
-  <input type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
+  <div class="borderbox">
 
-  <legend>Income per hour £</legend>
-  <input id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
+  <input class="bold" type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
+</div>
+
+  <legend>Income per hour </legend>
+  <div class="borderbox">
+    £<input class="bold" id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
+  </div>
 
   <button id="startButton" type="button">Start</button>
 
