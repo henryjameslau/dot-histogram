@@ -338,61 +338,67 @@
     .btn--primary {
       background-color: #206095 !important;
     }
-
   </style>
 
 </head>
 
 
 <body>
-
-  <div id="inputs">
-  <legend>Age</legend>
-
-  <!-- <input id='age' type="number" name="age" value="20" min="18" max="70"> -->
-
-  <div class="borderbox">
-    <span style="display:inline-block; text-align: center;">
-      <input class="bold" id="age" type="number" value="20" max="70" min="18">
-    </span><span style="display:inline-block;vertical-align:top;">
-      <button type="button" id="plus" class="plus"><i class="fas fa-caret-up white"></i></button>
-      <button type="button" id="minus" class="minus"><i class="fas fa-caret-down white"></i></button>
-    </span></div>
+  <div class="row no-gutters">
+    <div class="col-1" id="timeline"></div>
+    <div class="col-11" id="inputs">
 
 
-  <legend>Sex</legend>
+      <legend>Age</legend>
 
-  <div class="btn btn--select " aria-labelledby="Male">
-    <input type="radio" name="gender" value="Male" autocomplete="off" tabindex="0">Male
-  </div><div class="btn btn--select " tabindex="0" aria-labelledby="Female">
-    <input type="radio" name="gender" value="Female" autocomplete="off" tabindex="0" checked>Female
+      <!-- <input id='age' type="number" name="age" value="20" min="18" max="70"> -->
+
+      <div class="borderbox">
+        <span style="display:inline-block; text-align: center;">
+          <input class="bold" id="age" type="number" value="20" max="65" min="18">
+        </span><span style="display:inline-block;vertical-align:top;">
+          <button type="button" id="plus" class="plus"><i class="fas fa-caret-up white"></i></button>
+          <button type="button" id="minus" class="minus"><i class="fas fa-caret-down white"></i></button>
+        </span></div>
+
+
+      <legend>Sex</legend>
+
+      <div class="btn btn--select " aria-labelledby="Male">
+        <input type="radio" name="gender" value="Male" autocomplete="off" tabindex="0">Male
+      </div>
+      <div class="btn btn--select " tabindex="0" aria-labelledby="Female">
+        <input type="radio" name="gender" value="Female" autocomplete="off" tabindex="0" checked>Female
+      </div>
+
+
+      <legend>Commute time (mins)</legend>
+      <div class="borderbox">
+
+        <input class="bold" type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
+      </div>
+
+      <legend>Income per hour </legend>
+      <div class="borderbox">
+        £<input class="bold" id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
+      </div>
+
+
+      <legend></legend>
+
+      <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Start</button>
+
+      <!-- end of inputs -->
+
+
+    </div>
+    <div id="graphic">
+      <img src="fallback.png" alt="[Chart]" />
+    </div>
+
+    <button id="incomeButton" type="button">Look at income</button>
+
   </div>
-
-
-  <legend>Commute time (mins)</legend>
-  <div class="borderbox">
-
-    <input class="bold" type="number" id="commuteTime" name="commuteTime" value="22" min="00" max="120">
-  </div>
-
-  <legend>Income per hour </legend>
-  <div class="borderbox">
-    £<input class="bold" id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
-  </div>
-
-
-  <legend></legend>
-
-  <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Start</button>
-
-  </div>
-  <!-- end of inputs -->
-
-  <div id="graphic" class="row no-gutters">
-    <img src="fallback.png" alt="[Chart]" />
-  </div>
-
-  <button id="incomeButton" type="button">Look at income</button>
   <h6 id="source">Source: Office for National Statistics</h6>
 
   <script src="../lib/modernizr.svg.min.js" type="text/javascript"></script>
@@ -403,6 +409,37 @@
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
   <script>
+    var graphic = d3.select('#graphic');
+    var source = d3.select('#source');
+    var pymChild = null;
+
+
+
+    height = parseInt(d3.select('#inputs').style('height'))
+    timelineWidth = parseInt(graphic.style("width")) / 12
+    timeline = d3.select('#timeline').append('svg').attr('height', height).attr('width', timelineWidth)
+
+    timeline.append('line')
+      .attr('x1', timelineWidth / 2)
+      .attr('x2', timelineWidth / 2)
+      .attr('y1', 75)
+      .attr('y2', 380)
+      .attr('stroke', 'grey')
+      .attr('stroke-dasharray', '2 2')
+      .attr('stroke-width', 2)
+
+    timeline.selectAll('circle')
+      .data([75, 175, 288, 381])
+      .enter()
+      .append('circle')
+      .attr('cy', function(d, i) {
+        return d
+      })
+      .attr('cx', timelineWidth / 2)
+      .attr('r', 10).style('fill', 'white')
+      .style('stroke', 'grey')
+      .style('stroke-width', 2)
+
     //button group
     d3.selectAll('.btn--select').on('click', function(d) {
       d3.selectAll('.btn').classed('active', false)
@@ -427,17 +464,11 @@
       }
     })
 
-    var graphic = d3.select('#graphic');
-    var source = d3.select('#source');
-    var pymChild = null;
+
 
     function drawGraphic(width) {
 
-      //grab values
-      gender = document.querySelector('input[name="gender"]:checked').value;
-      age = +document.getElementById('age').value
-      commuteTime = +document.getElementById('commuteTime').value
-      income = +document.getElementById('income').value
+
       // clear out existing graphics
       graphic.selectAll("*").remove();
       source.selectAll("*").remove();
@@ -500,11 +531,18 @@
       })
 
       d3.select('#startButton').on('click', function() {
+        //grab values
+        gender = document.querySelector('input[name="gender"]:checked').value;
+        age = +document.getElementById('age').value
+        commuteTime = +document.getElementById('commuteTime').value
+        income = +document.getElementById('income').value
+
         byAge(age, gender)
-        console.log('startButton')
+        console.log('startButton', age, gender, commuteTime, income)
       })
 
       function byAge(age, gender) {
+
         myAgeData = graphic_data.filter(function(d) {
           return +d.Age === +age
         })
@@ -514,15 +552,15 @@
         console.log('myDistribution', myDistribution)
 
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
-        x.domain([0, xMax]).nice();
+        x.domain([0, 90]).nice();
 
         var histos = myDistribution.map(function(d) {
           var thisHisto = d3.histogram()
             .value(function(d) {
               return d
             })
-            .domain(x.domain())
-            .thresholds(range(x.domain()[0], x.domain()[1], 1))
+            .domain([0, xMax])
+            .thresholds(range(x.domain()[0], 90, 1))
 
           return {
             gender: d.Gender,
@@ -605,20 +643,39 @@
 
 
         annotations = [{
+            note: {
+              label: "00:00",
+              title: "You"
+            },
+            x: x(0),
+            y: height / 2,
+            dy: 20,
+            dx: 20,
+            className: gender,
+            subject: {
+              radius: 2 * radius,
+              radiusPadding: 0
+            },
+            type: d3.annotationCalloutCircle
+          }
+        ]
+
+        maleAverageAnnotation = [{
           note: {
             label: "00:00",
-            title: "You"
+            title: "Average commute for a man"
           },
-          x: x(0),
-          y: height / 2,
-          dy: 20,
-          dx: 20,
-          className: gender,
+          //can use x, y directly instead of data
+          x:x(0),
+          y:0,
+          dy: 10,
+          dx: +20,
           subject: {
-            radius: 2 * radius,
-            radiusPadding: 0
+            y1: 0,
+            y2: height/2
           },
-          type: d3.annotationCalloutCircle
+          type:d3.annotationXYThreshold,
+          disable:["connector"]
         }]
 
 
@@ -626,10 +683,15 @@
         makeAnnotations = d3.annotation()
           .annotations(annotations)
 
+        makeMaleAnnotations = d3.annotation()
+          .annotations(maleAverageAnnotation)
+
         svg.append('g')
           .attr('class', 'annotation-group')
           .call(makeAnnotations)
+          .call(makeMaleAnnotations)
 
+        maleAverageCommuteTime = myAgeData.filter(function(d){return d.Sex==gender})[0]["D5"]
 
         d3.transition()
           .duration(commuteTime * 40)
@@ -645,6 +707,23 @@
               makeAnnotations.update()
             }
           })
+
+        //
+        // d3.transition()
+        //     .duration(maleAverageCommuteTime*40)
+        //     .ease(d3.easeLinear)
+        //     .tween('updateMaleAnno', function(d) {
+        //       xAveM = d3.interpolateNumber(0, maleAverageCommuteTime)
+        //       AveMtimeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"), new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000))
+        //
+        //       return function(u) {
+        //         maleAverageAnnotation[0].x = x(xAveM(u));
+        //         maleAverageAnnotation[0].note.label = d3.timeFormat("%H:%M")(AveMtimeTrans(u))
+        //         makeMaleAnnotations.annotations(maleAverageAnnotation)
+        //         makeMaleAnnotations.update()
+        //       }
+        //     })
+
 
 
       } //end of byAge
@@ -691,7 +770,7 @@
         d3.select('.x').transition().duration(750).call(d3.axisBottom(x))
 
         x.range([0, chart_width])
-          .domain([0, incomeXMax]).nice()
+          .domain([0, 60]).nice()
         d3.select('.x').transition().delay(750).duration(750).call(d3.axisBottom(x))
 
         var histos = myDistribution.map(function(d) {
@@ -699,8 +778,8 @@
             .value(function(d) {
               return d
             })
-            .domain(x.domain())
-            .thresholds(range(x.domain()[0], x.domain()[1], incomeXMax / 100))
+            .domain([0, incomeXMax])
+            .thresholds(range(x.domain()[0], 60, 0.6))
 
           return {
             gender: d.Gender,
@@ -731,7 +810,7 @@
         sides = svg.selectAll(".sides")
           .data(histos)
 
-        var radius = x(incomeXMax / 100) * 0.45
+        var radius = x(0.6) * 0.45
 
         sides.selectAll('circle')
           .data(function(d) {
