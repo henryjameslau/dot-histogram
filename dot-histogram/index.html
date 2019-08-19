@@ -22,6 +22,21 @@
       color: #323132;
     }
 
+    h4 {
+      font-size: 16px;
+      line-height: 24px;
+      margin: 16px 0 8px 0;
+      padding: 24px 0 0 0;
+      font-weight: 700;
+    }
+
+    h5 {
+      font-size: 14px;
+      margin: 0 0 16px 0;
+      font-weight: 400;
+      padding-top: 0;
+    }
+
     g.annotation-subject path.subject {
       fill: darkgrey;
       fill-opacity: 1;
@@ -338,6 +353,14 @@
     .btn--primary {
       background-color: #206095 !important;
     }
+
+    path.note-line {
+      opacity: 0
+    }
+
+    .averageLine {
+      opacity: 0;
+    }
   </style>
 
 </head>
@@ -392,11 +415,15 @@
 
 
     </div>
+    <div id="chart-titles">
+      <h4 id="title"></h4>
+      <h5 id="subtitle"></h5>
+    </div>
     <div id="graphic">
       <img src="fallback.png" alt="[Chart]" />
     </div>
 
-    <button id="incomeButton" type="button">Look at income</button>
+    <button id="incomeButton" type="button">Compare the earnings of people who do a similar commute to you</button>
 
   </div>
   <h6 id="source">Source: Office for National Statistics</h6>
@@ -537,11 +564,11 @@
         commuteTime = +document.getElementById('commuteTime').value
         income = +document.getElementById('income').value
 
-        byAge(age, gender)
+        byAge(age, gender, commuteTime)
         console.log('startButton', age, gender, commuteTime, income)
       })
 
-      function byAge(age, gender) {
+      function byAge(age, gender, commuteTime) {
 
         myAgeData = graphic_data.filter(function(d) {
           return +d.Age === +age
@@ -550,6 +577,14 @@
         console.log('myAgeData', myAgeData)
         var myDistribution = createDistribution(myAgeData)
         console.log('myDistribution', myDistribution)
+
+        percentile = myDistribution.filter(function(d) {
+          return d.Gender == gender
+        })[0].values.findIndex(function(d) {
+          return d > commuteTime
+        })
+
+        console.log("percentile", percentile)
 
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
         x.domain([0, 90]).nice();
@@ -565,9 +600,9 @@
           return {
             gender: d.Gender,
             age: d.Age,
-            values: thisHisto(d.values).filter(function(d) {
-              return d.length > 0
-            }),
+            values: thisHisto(d.values),//.filter(function(d) {
+              //return d.length > 0
+            //}),
             no: d.values.length
           }
         })
@@ -589,8 +624,24 @@
           d.circles = dummy;
         })
 
+
         console.log('histos', histos)
 
+
+        circleIndex = histos.filter(function(d){return d.gender == gender})[0].values.findIndex(function(d){
+          return d.x0>commuteTime
+        })
+        console.log(histos.filter(function(d){return d.gender == gender})[0].values[circleIndex-1].length)
+
+        var radius = x(1) - x(0.5)
+
+        if(gender=="Male"){
+          circleHeight = -2*radius * (histos.filter(function(d){return d.gender == gender})[0].values[circleIndex-1].length)-radius
+        }else if(gender=="Female"){
+          circleHeight = 2*radius*(histos.filter(function(d){return d.gender == gender})[0].values[circleIndex-1].length)+radius
+        }
+
+        console.log(circleHeight/radius)
         sides = svg.selectAll(".sides")
           .data(histos)
           .enter()
@@ -600,8 +651,6 @@
             return d.gender
           })
           .attr('transform', 'translate(0,' + height / 2 + ')')
-
-        var radius = x(1) - x(0.5)
 
         sides.selectAll('circle')
           .data(function(d) {
@@ -641,89 +690,113 @@
 
         //use data entered by user, then map it to make the annotations array, use the gender to assign a class so you can style it and put it the right side of the line.
 
+        maleAverageCommuteTime = myAgeData.filter(function(d) {
+          return d.Sex == "Male"
+        })[0]["D5"]
+
+        femaleAverageCommuteTime = myAgeData.filter(function(d) {
+          return d.Sex == "Female"
+        })[0]["D5"]
+
+        yourGenderAverageCommute = myAgeData.filter(function(d) {
+          return d.Sex == gender
+        })[0]["D5"]
+
+        d3.select("#title").html(function() {
+          if (gender == "Male") {
+            return "The median commute time for a man your age is " + d3.timeFormat("%M:%S")(new Date(new Date("January 01, 2019 00:00:00").getTime() + yourGenderAverageCommute * 60000)) + " minutes."
+          } else if (gender == "Female") {
+            return "The median commute time for a woman your age is " + d3.timeFormat("%M:%S")(new Date(new Date("January 01, 2019 00:00:00").getTime() + yourGenderAverageCommute * 60000)) + " minutes."
+          }
+        })
+
+        d3.select("#subtitle").html(function() {
+          if (gender == "Male") {
+            return "Your journey to work is among the " + percentile + "% longest commutes for men your age."
+          } else if (gender == "Female") {
+            return "Your journey to work is among the " + percentile + "% longest commutes for women your age."
+          }
+        })
 
         annotations = [{
-            note: {
-              label: "00:00",
-              title: "You"
-            },
-            x: x(0),
-            y: height / 2,
-            dy: 20,
-            dx: 20,
-            className: gender,
-            subject: {
-              radius: 2 * radius,
-              radiusPadding: 0
-            },
-            type: d3.annotationCalloutCircle
-          }
-        ]
-
-        maleAverageAnnotation = [{
           note: {
             label: "00:00",
-            title: "Average commute for a man"
+            title: "You"
           },
-          //can use x, y directly instead of data
-          x:x(0),
-          y:0,
-          dy: 10,
-          dx: +20,
+          x: x(0),
+          y: (height / 2) + circleHeight,
+          dy: gender=="Female" ? 10 : -10,
+          dx: commuteTime > yourGenderAverageCommute ? 20:-20,
+          className: gender,
+          subject: {
+            radius: radius,
+            radiusPadding: 0
+          },
+          type: d3.annotationCalloutCircle
+        }, {
+          note: {
+            label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + femaleAverageCommuteTime * 60000)),
+            title: "Average commute for a woman your age",
+            wrap:250
+          },
+          x: x(femaleAverageCommuteTime),
+          y: height,
+          dy: -1,
+          dx: +10,
+          className: 'averageLine',
+          subject: {
+            y1: height,
+            y2: height / 2
+          },
+          type: d3.annotationXYThreshold,
+          disable: ["connector"]
+        }, {
+          note: {
+            label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000)),
+            title: "Average commute for a man your age",
+            wrap:250
+          },
+          x: x(maleAverageCommuteTime),
+          y: 1,
+          dy: 0,
+          dx: +10,
+          className: 'averageLine',
           subject: {
             y1: 0,
-            y2: height/2
+            y2: height / 2
           },
-          type:d3.annotationXYThreshold,
-          disable:["connector"]
+          type: d3.annotationXYThreshold,
+          disable: ["connector"]
         }]
-
-
 
         makeAnnotations = d3.annotation()
           .annotations(annotations)
 
-        makeMaleAnnotations = d3.annotation()
-          .annotations(maleAverageAnnotation)
-
         svg.append('g')
+          .data(annotations)
           .attr('class', 'annotation-group')
           .call(makeAnnotations)
-          .call(makeMaleAnnotations)
 
-        maleAverageCommuteTime = myAgeData.filter(function(d){return d.Sex==gender})[0]["D5"]
 
         d3.transition()
           .duration(commuteTime * 40)
           .ease(d3.easeLinear)
-          .tween('updateAnno', function(d) {
+          .tween('updateAnno', function(d, i) {
             xTrans = d3.interpolateNumber(0, commuteTime)
             timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"), new Date(new Date("January 01, 2019 00:00:00").getTime() + commuteTime * 60000))
 
             return function(t) {
-              annotations[0].x = x(xTrans(t));
+              annotations[i].x = x(xTrans(t));
               annotations[0].note.label = d3.timeFormat("%H:%M")(timeTrans(t))
               makeAnnotations.annotations(annotations)
               makeAnnotations.update()
             }
           })
 
-        //
-        // d3.transition()
-        //     .duration(maleAverageCommuteTime*40)
-        //     .ease(d3.easeLinear)
-        //     .tween('updateMaleAnno', function(d) {
-        //       xAveM = d3.interpolateNumber(0, maleAverageCommuteTime)
-        //       AveMtimeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"), new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000))
-        //
-        //       return function(u) {
-        //         maleAverageAnnotation[0].x = x(xAveM(u));
-        //         maleAverageAnnotation[0].note.label = d3.timeFormat("%H:%M")(AveMtimeTrans(u))
-        //         makeMaleAnnotations.annotations(maleAverageAnnotation)
-        //         makeMaleAnnotations.update()
-        //       }
-        //     })
-
+        d3.selectAll(".averageLine").transition()
+          .delay(commuteTime * 80)
+          .transition()
+          .style('opacity', 1)
 
 
       } //end of byAge
@@ -731,6 +804,10 @@
 
       function byIncome() {
         console.log('Income button')
+
+        d3.selectAll(".averageLine").transition()
+          .style('opacity', 0)
+
         sides.selectAll('circle')
           .transition()
           .attr('cx', x(commuteTime))
@@ -862,7 +939,7 @@
       var dummy = []
       test = data.map(function(d) {
         var filled = []
-        fillNumbers(10, [d.D0, d.D1]).forEach(function(e) {
+        fillNumbers(9, [d.P1, d.D1]).forEach(function(e) {
           filled.push(e)
         })
         fillNumbers(10, [d.D1, d.D2]).forEach(function(e) {
@@ -944,6 +1021,53 @@
       if (pymChild) {
         pymChild.sendHeight();
       }
+    }
+
+    //findIndex polyfill
+    if (!Array.prototype.findIndex) {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        value: function(predicate) {
+          // 1. Let O be ? ToObject(this value).
+          if (this == null) {
+            throw new TypeError('"this" is null or not defined');
+          }
+
+          var o = Object(this);
+
+          // 2. Let len be ? ToLength(? Get(O, "length")).
+          var len = o.length >>> 0;
+
+          // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+          if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+          }
+
+          // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+          var thisArg = arguments[1];
+
+          // 5. Let k be 0.
+          var k = 0;
+
+          // 6. Repeat, while k < len
+          while (k < len) {
+            // a. Let Pk be ! ToString(k).
+            // b. Let kValue be ? Get(O, Pk).
+            // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+            // d. If testResult is true, return k.
+            var kValue = o[k];
+            if (predicate.call(thisArg, kValue, k, o)) {
+              return k;
+            }
+            // e. Increase k by 1.
+            k++;
+          }
+
+          // 7. Return -1.
+          return -1;
+        },
+        configurable: true,
+        writable: true
+      });
     }
   </script>
 </body>
