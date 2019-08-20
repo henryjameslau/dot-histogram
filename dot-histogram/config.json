@@ -6,12 +6,12 @@
   },
 
   "optional": {
-    "margin_sm": [10, 10, 30, 10],
-    "margin_md": [10, 10, 30, 10],
-    "margin_lg": [10, 10, 30, 10],
+    "margin_sm": [10, 12, 30, 10],
+    "margin_md": [10, 12, 30, 10],
+    "margin_lg": [10, 12, 30, 10],
 
-    "aspectRatio_sm": [16, 13],
-    "aspectRatio_md": [16, 12],
+    "aspectRatio_sm": [16, 20],
+    "aspectRatio_md": [16, 14],
     "aspectRatio_lg": [16, 10],
 
     "mediumBreakpoint": 576,
