@@ -37,10 +37,18 @@
       padding-top: 0;
     }
 
-    g.annotation-subject path.subject {
-      fill: darkgrey;
-      fill-opacity: 1;
+    path.domain {
+      opacity: 0;
+    }
 
+    .tick line {
+      stroke-dasharray: 2 2;
+    }
+
+    g.annotation-subject path.subject {
+      fill: #FF9933;
+      fill-opacity: 1;
+      stroke: #323132;
     }
 
 
@@ -439,6 +447,8 @@
       opacity: 0;
     }
 
+
+
     .pound {
       float: left;
       display: inline;
@@ -451,6 +461,7 @@
       float: left;
       font-weight: 600;
       box-sizing: border-box;
+      padding-top: 2px;
     }
   </style>
 
@@ -499,7 +510,7 @@
         <div>
           <div class="borderbox" style="float:left;">
             <div class="pound">£</div>
-            <input style="width:73%" class="bold" id='income' type="number" name="income" step="0.01" value="4.5" min="0" max="100">
+            <input style="width:73%" class="bold" id='income' type="number" name="income" step="0.01" value="5.7" min="0" max="100">
           </div>
           <div class="select" style="display:inline-block;margin-left:8px;">
 
@@ -529,15 +540,15 @@
       <div id="graphic">
         <img src="fallback.png" alt="[Chart]" />
       </div>
+      <h6 id="source">Source: Office for National Statistics</h6>
 
-
-      Compare the earnings of people who do a similar commute to you
+      <div>Compare the earnings of people who do a similar commute to you</div>
       <button class="btn btn--primary btn--next" id="incomeButton" type="button">Next</button>
 
       <button class="btn btn--primary btn--primary-disabled btn--restart" id="restart">Restart</button>
     </div>
   </div>
-  <!-- <h6 id="source">Source: Office for National Statistics</h6> -->
+
 
   <script src="../lib/modernizr.svg.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/d3/4.13.0/d3.min.js" type="text/javascript"></script>
@@ -680,30 +691,6 @@
         .fill().map((v, i) => from + i * step);
 
       //set up functions on buttons
-      d3.select('#incomeButton').on('click', function() {
-        incomeButton()
-      })
-
-      function incomeButton(){
-        byIncome()
-        d3.select('#incomeButton').classed("btn--primary-disabled",true)
-        d3.select('#incomeButton').on('click', function() {
-          incomeButton()
-        })
-        d3.select("#restart").classed("btn--primary-disabled",false)
-        d3.select("#restart").on('click',function(){
-          restart()
-        })
-      }
-
-      function restart(){
-        d3.select('#incomeButton').classed("btn--primary-disabled",false)
-        d3.select("#restart").classed("btn--primary-disabled",true)
-        d3.select("#part1").classed('d-none',false)
-        d3.select("#part2").classed('d-none',true)
-        d3.select("#restart").on('click',null)
-      }
-
       d3.select('#startButton').on('click', function() {
         //grab values
         gender = document.querySelector('input[name="gender"]:checked').value;
@@ -711,12 +698,41 @@
         commuteTime = +document.getElementById('commuteTimeInput').value
         income = +document.getElementById('income').value
 
-        d3.select("#part1").classed('d-none',true)
-        d3.select("#part2").classed('d-none',false)
+        d3.select("#part1").classed('d-none', true)
+        d3.select("#part2").classed('d-none', false)
+
+        d3.select('#incomeButton').on('click', function() {
+          incomeButton()
+        })
 
         byAge(age, gender, commuteTime)
         console.log('startButton', age, gender, commuteTime, income)
       })
+
+      d3.select('#incomeButton').on('click', function() {
+        incomeButton()
+      })
+
+      function incomeButton() {
+        byIncome()
+        d3.select('#incomeButton').classed("btn--primary-disabled", true)
+
+        d3.select("#incomeButton").on('click', null)
+        d3.select("#restart").classed("btn--primary-disabled", false)
+        d3.select("#restart").on('click', function() {
+          restart()
+        })
+      }
+
+      function restart() {
+        d3.select('#incomeButton').classed("btn--primary-disabled", false)
+        d3.select("#restart").classed("btn--primary-disabled", true)
+        d3.select("#part1").classed('d-none', false)
+        d3.select("#part2").classed('d-none', true)
+        d3.select("#restart").on('click', null)
+      }
+
+
 
       function byAge(age, gender, commuteTime) {
         svg.selectAll("*").remove();
@@ -764,7 +780,8 @@
             } else {
               return d
             }
-          });
+          })
+          .tickSize(-height);
 
         histos.forEach(function(d) {
           var dummy = [];
@@ -825,6 +842,11 @@
 
         d3.select("#subtitle").html("Commute times for people aged " + age + ", Great Britain, 2010 to 2018")
 
+        svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0,' + height + ')')
+          .call(xAxis)
+
         sides = svg.selectAll(".sides")
           .data(histos)
           .enter()
@@ -835,19 +857,42 @@
           })
           .attr('transform', 'translate(0,' + height / 2 + ')')
 
+        sides.append('text')
+          .attr('y', function(d) {
+            if (d.gender == "Male") {
+              return -height / 4
+            } else {
+              return height / 4
+            }
+          })
+          .attr('font-weight', 700)
+          .style('fill', function(d) {
+            if (d.gender == "Male") {
+              return "#234D70"
+            } else {
+              return "#00A5A1"
+            }
+          })
+          .text(function(d) {
+            if (d.gender == "Male") {
+              return "Men"
+            } else {
+              return "Women"
+            }
+          })
+
         sides.selectAll('circle')
           .data(function(d) {
             return d.circles
           })
           .enter()
           .append('circle')
-
           .attr('r', x(1) - x(0.55))
           .attr('fill', function(d) {
             if (d.gender === "Male") {
-              return "blue"
+              return "#234D70"
             } else if (d.gender === "Female") {
-              return "red"
+              return "#00A5A1"
             }
           })
           .transition()
@@ -866,11 +911,13 @@
             }
           })
 
-        svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(xAxis)
 
+
+        xAxisLabel = svg.append('text')
+          .text('minutes')
+          .attr('x', chart_width)
+          .attr('y', height + margin.bottom - 2)
+          .attr('text-anchor', 'end')
 
 
         annotations = [{
@@ -880,9 +927,10 @@
           },
           x: x(0),
           y: (height / 2) + circleHeight,
-          dy: gender == "Female" ? 10 : -10,
-          dx: x(commuteTime) < chart_width / 2 ? 20 : -20,
-          className: gender,
+          dy: gender == "Female" ? 20 : -20,
+          dx: x(commuteTime) < chart_width / 2 ? 40 : -40,
+          //color: gender == "Female" ? "#00A5A1" : "#234D70",
+          connector:{"end":"arrow"},
           subject: {
             radius: radius,
             radiusPadding: 0
@@ -892,7 +940,7 @@
           note: {
             label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + femaleAverageCommuteTime * 60000)),
             title: "Average commute for a woman your age",
-            wrap: 250
+            wrap: chart_width-x(femaleAverageCommuteTime)
           },
           x: x(femaleAverageCommuteTime),
           y: height,
@@ -909,7 +957,7 @@
           note: {
             label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000)),
             title: "Average commute for a man your age",
-            wrap: 250
+            wrap: chart_width-x(maleAverageCommuteTime)
           },
           x: x(maleAverageCommuteTime),
           y: 1,
@@ -933,6 +981,7 @@
           .call(makeAnnotations)
 
 
+
         d3.transition()
           .duration(commuteTime * 40)
           .ease(d3.easeLinear)
@@ -952,6 +1001,7 @@
           .delay(commuteTime * 80)
           .transition()
           .style('opacity', 1)
+          .attr('stroke-dasharray', '4 4')
 
 
       } //end of byAge
@@ -1016,12 +1066,15 @@
           .delay(750)
           .duration(750)
           .call(d3.axisBottom(x).tickFormat(function(d) {
-            if (d == x.domain()[1]) {
-              return d + "+"
-            } else {
-              return d
-            }
-          }))
+              if (d == x.domain()[1]) {
+                return d + "+"
+              } else {
+                return d
+              }
+            })
+            .tickSize(-height))
+
+        xAxisLabel.transition().text("£ per hour")
 
         var histos = myDistribution.map(function(d) {
           var thisHisto = d3.histogram()
@@ -1103,6 +1156,7 @@
         annotations.pop()
         annotations.pop()
 
+        annotations[0].dx=x(income) < chart_width / 2 ? 80 : -80
 
         annotations.push({
           note: {
