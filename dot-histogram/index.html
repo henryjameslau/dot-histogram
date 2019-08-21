@@ -22,19 +22,37 @@
       color: #323132;
     }
 
-    h4 {
-      font-size: 16px;
-      line-height: 24px;
-      margin: 16px 0 8px 0;
-      padding: 24px 0 0 0;
-      font-weight: 700;
-    }
-
     h5 {
       font-size: 14px;
       margin: 0 0 16px 0;
       font-weight: 400;
       padding-top: 0;
+    }
+
+    h4 {
+      background-color: #206095;
+      font-size: 16px;
+      line-height: 24px;
+      margin: 16px 0 8px 0;
+      padding: 15px 10px;
+      font-weight: 700;
+      color: white;
+    }
+
+    #bottomText {
+      background-color: #eaeaea;
+      font-size: 16px;
+      line-height: 24px;
+      margin: 16px 0 8px 0;
+      padding: 15px 10px;
+      font-weight: 700;
+      color: #206095;
+    }
+
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid #E5E6E7;
     }
 
     path.domain {
@@ -43,6 +61,10 @@
 
     .tick line {
       stroke-dasharray: 2 2;
+    }
+
+    .tick text {
+      fill: #A6A8AB;
     }
 
     g.annotation-subject path.subject {
@@ -143,13 +165,13 @@
       color: #206095;
       border: 2px solid #206095;
       margin-right: 15px;
-      margin-bottom: 15px;
+      /* margin-bottom: 15px; */
       transition: all ease .2s;
       /* border-radius: 30px !important; */
     }
 
     .btn--primary {
-      background-color: #206095;
+      background-color: #139060;
     }
 
     .btn--primary-disabled {
@@ -209,7 +231,7 @@
       padding: 0;
     }
 
-    input {
+    /* input {
       border: none;
       border-bottom-color: currentcolor;
       border-bottom-style: none;
@@ -220,7 +242,7 @@
       line-height: 32px;
       margin: 16px 0;
       padding: 6px 0 0 0;
-    }
+    } */
 
     input,
     select {
@@ -337,12 +359,25 @@
       line-height: 20px;
       width: 55px;
       /* margin: 16px 0; */
-      padding: 6px 0 6px 0;
+      /* padding: 6px 0 6px 0; */
       width: 60px;
       text-align: center;
       float: left;
+      -webkit-appearance: none;
       -moz-appearance: textfield;
       appearance: textfield;
+    }
+
+    @-moz-document url-prefix() {
+      input[type=number] {
+        padding: 6px 0 6px 0;
+      }
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     input:focus {
@@ -463,6 +498,12 @@
       box-sizing: border-box;
       padding-top: 2px;
     }
+
+    .error_message {
+      margin-top: 10px;
+      padding: 13px;
+      border: solid 3px #D32F2F;
+    }
   </style>
 
 </head>
@@ -488,25 +529,27 @@
             <!-- </span><span style="display:inline-block;vertical-align:top;"> -->
           </span></div>
 
-
+        <hr>
         <legend>Sex</legend>
-
-        <div class="btn btn--select bold" aria-labelledby="Male">
-          <input type="radio" name="gender" value="Male" autocomplete="off" tabindex="0">Male
+        <div id="genderbuttons" style="padding-bottom:4px;">
+          <div class="btn btn--select bold" aria-labelledby="Male">
+            <input type="radio" name="gender" value="Male" autocomplete="off" tabindex="0">Male
+          </div>
+          <div class="btn btn--select bold" tabindex="0" aria-labelledby="Female">
+            <input type="radio" name="gender" value="Female" autocomplete="off" tabindex="0">Female
+          </div>
         </div>
-        <div class="btn btn--select bold" tabindex="0" aria-labelledby="Female">
-          <input type="radio" name="gender" value="Female" autocomplete="off" tabindex="0" checked>Female
-        </div>
 
-
-        <legend>Commute time (mins)</legend>
+        <hr>
+        <legend>Commute time (minutes)</legend>
         <div class="borderbox">
           <button type="button" id="minus2" class="minus"><i class="fas fa-minus white"></i></button>
           <input class="bold" type="number" id="commuteTimeInput" name="commuteTime" value="22" min="00" max="120">
           <button type="button" id="plus2" class="plus"><i class="fas fa-plus white"></i></button>
         </div>
 
-        <legend>Earnings</legend>
+        <hr>
+        <legend>Earnings (before tax)</legend>
         <div>
           <div class="borderbox" style="float:left;">
             <div class="pound">£</div>
@@ -515,21 +558,27 @@
           <div class="select" style="display:inline-block;margin-left:8px;">
 
             <select class="bold" name="select">
-              <option selected="" disabled="">Select an option</option>
+              <!-- <option selected="" disabled="">Select an option</option> -->
               <option value="byYear">per year</option>
-              <option value="byHour">per hour</option>
+              <option selected value="byHour">per hour</option>
             </select>
 
           </div>
         </div>
 
+        <hr>
         <div style="padding-top:20px;">
           <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Start</button>
         </div>
+
+
         <!-- end of inputs -->
 
 
       </div>
+    </div>
+    <div id="warning" class="d-none error_message">
+      <p>Have you filled out every field?</p>
     </div>
 
     <div id="part2" class="d-none">
@@ -542,7 +591,7 @@
       </div>
       <h6 id="source">Source: Office for National Statistics</h6>
 
-      <div>Compare the earnings of people who do a similar commute to you</div>
+      <div id="bottomText">Click next to compare the earnings of people who do a similar commute to you.</div>
       <button class="btn btn--primary btn--next" id="incomeButton" type="button">Next</button>
 
       <button class="btn btn--primary btn--primary-disabled btn--restart" id="restart">Restart</button>
@@ -554,7 +603,7 @@
   <script src="https://cdn.ons.gov.uk/vendor/d3/4.13.0/d3.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.js" type="text/javascript"></script>
-  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
   <script>
@@ -572,14 +621,19 @@
     timeline.append('line')
       .attr('x1', timelineWidth / 2)
       .attr('x2', timelineWidth / 2)
-      .attr('y1', 77)
-      .attr('y2', 395)
+      .attr('y1', document.getElementById('age').getBoundingClientRect().top + document.getElementById('age').getBoundingClientRect().height / 2)
+      .attr('y2', document.getElementById('income').getBoundingClientRect().top + document.getElementById('income').getBoundingClientRect().height / 2)
       .attr('stroke', 'grey')
       .attr('stroke-dasharray', '2 2')
       .attr('stroke-width', 2)
 
     timeline.selectAll('circle')
-      .data([77, 182, 297, 395])
+      .data([
+        document.getElementById('age').getBoundingClientRect().top + document.getElementById('age').getBoundingClientRect().height / 2, document.getElementById('genderbuttons').getBoundingClientRect().top + document.getElementById('genderbuttons')
+        .getBoundingClientRect().height / 2 - 4,
+        document.getElementById('commuteTimeInput').getBoundingClientRect().top + document.getElementById('commuteTimeInput').getBoundingClientRect().height / 2,
+        document.getElementById('income').getBoundingClientRect().top + document.getElementById('income').getBoundingClientRect().height / 2
+      ])
       .enter()
       .append('circle')
       .attr('cy', function(d, i) {
@@ -690,33 +744,51 @@
         Array(~~((to - from) / step) + 1) // '~~' is Alternative for Math.floor()
         .fill().map((v, i) => from + i * step);
 
+
+
+
+
       //set up functions on buttons
       d3.select('#startButton').on('click', function() {
+
+        checkInputs()
         //grab values
-        gender = document.querySelector('input[name="gender"]:checked').value;
-        age = +document.getElementById('age').value
-        commuteTime = +document.getElementById('commuteTimeInput').value
-        income = +document.getElementById('income').value
 
-        d3.select("#part1").classed('d-none', true)
-        d3.select("#part2").classed('d-none', false)
-
-        d3.select('#incomeButton').on('click', function() {
-          incomeButton()
-        })
-
-        byAge(age, gender, commuteTime)
-        console.log('startButton', age, gender, commuteTime, income)
       })
 
       d3.select('#incomeButton').on('click', function() {
         incomeButton()
       })
 
+      function checkInputs() {
+        gendercheck = document.querySelector('input[name="gender"]:checked');
+        age = +document.getElementById('age').value
+        commuteTime = +document.getElementById('commuteTimeInput').value
+        income = +document.getElementById('income').value
+
+        if (gendercheck == null || age == "" || age == null || commuteTime == "" || commuteTime == null || income == "" || income == null) {
+          d3.select("#warning").classed("d-none", false)
+        } else {
+          gender = document.querySelector('input[name="gender"]:checked').value;
+          d3.select("#warning").classed("d-none", true)
+          d3.select("#part1").classed('d-none', true)
+          d3.select("#part2").classed('d-none', false)
+
+          d3.select('#incomeButton').on('click', function() {
+            incomeButton()
+          })
+
+          byAge(age, gender, commuteTime)
+          console.log('startButton', age, gender, commuteTime, income)
+
+        }
+
+      }
+
       function incomeButton() {
         byIncome()
         d3.select('#incomeButton').classed("btn--primary-disabled", true)
-
+        d3.select("#bottomText").classed('d-none', true)
         d3.select("#incomeButton").on('click', null)
         d3.select("#restart").classed("btn--primary-disabled", false)
         d3.select("#restart").on('click', function() {
@@ -730,6 +802,7 @@
         d3.select("#part1").classed('d-none', false)
         d3.select("#part2").classed('d-none', true)
         d3.select("#restart").on('click', null)
+        d3.select("#bottomText").classed('d-none', false)
       }
 
 
@@ -915,8 +988,9 @@
 
         xAxisLabel = svg.append('text')
           .text('minutes')
+          .style('fill', '#A6A8AB')
           .attr('x', chart_width)
-          .attr('y', height + margin.bottom - 2)
+          .attr('y', height + margin.bottom - 6)
           .attr('text-anchor', 'end')
 
 
@@ -929,8 +1003,10 @@
           y: (height / 2) + circleHeight,
           dy: gender == "Female" ? 20 : -20,
           dx: x(commuteTime) < chart_width / 2 ? 40 : -40,
-          //color: gender == "Female" ? "#00A5A1" : "#234D70",
-          connector:{"end":"arrow"},
+          color: "#323132",
+          connector: {
+            "end": "arrow"
+          },
           subject: {
             radius: radius,
             radiusPadding: 0
@@ -940,7 +1016,7 @@
           note: {
             label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + femaleAverageCommuteTime * 60000)),
             title: "Average commute for a woman your age",
-            wrap: chart_width-x(femaleAverageCommuteTime)
+            wrap: chart_width - x(femaleAverageCommuteTime)
           },
           x: x(femaleAverageCommuteTime),
           y: height,
@@ -957,7 +1033,7 @@
           note: {
             label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000)),
             title: "Average commute for a man your age",
-            wrap: chart_width-x(maleAverageCommuteTime)
+            wrap: chart_width - x(maleAverageCommuteTime)
           },
           x: x(maleAverageCommuteTime),
           y: 1,
@@ -1156,7 +1232,7 @@
         annotations.pop()
         annotations.pop()
 
-        annotations[0].dx=x(income) < chart_width / 2 ? 80 : -80
+        annotations[0].dx = x(income) < chart_width / 2 ? 80 : -80
 
         annotations.push({
           note: {
