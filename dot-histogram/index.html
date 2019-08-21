@@ -207,7 +207,12 @@
     input[type="checkbox"],
     input[type="radio"] {
       -webkit-appearance: none;
-      appearance:none;
+      appearance: none;
+      display: none;
+    }
+
+    select::-ms-expand {
+      display: none;
     }
 
     .btn-group input {
@@ -373,6 +378,12 @@
       input[type=number] {
         padding: 6px 0 6px 0;
       }
+    }
+
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+       input[type=number] {
+            padding: 5px 0 0 0;
+       }
     }
 
     input::-webkit-outer-spin-button,
