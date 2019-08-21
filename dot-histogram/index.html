@@ -544,7 +544,7 @@
         <legend>Commute time (minutes)</legend>
         <div class="borderbox">
           <button type="button" id="minus2" class="minus"><i class="fas fa-minus white"></i></button>
-          <input class="bold" type="number" id="commuteTimeInput" name="commuteTime" value="22" min="00" max="120">
+          <input class="bold" type="number" id="commuteTimeInput" name="commuteTime" value="22" min="1" max="120">
           <button type="button" id="plus2" class="plus"><i class="fas fa-plus white"></i></button>
         </div>
 
@@ -559,7 +559,7 @@
 
             <select class="bold" name="select">
               <!-- <option selected="" disabled="">Select an option</option> -->
-              <option value="byYear">per year</option>
+              <!-- <option value="byYear">per year</option> -->
               <option selected value="byHour">per hour</option>
             </select>
 
@@ -881,6 +881,16 @@
           return d.x0 > commuteTime
         })
 
+        console.log(circleIndex)
+
+        if(commuteTime>89){
+          circleIndex=91
+          commuteTimeReal=commuteTime
+          commuteTime=90
+        }else{
+          commuteTimeReal=commuteTime
+        }
+
         var radius = x(1) - x(0.5)
 
         if (gender == "Male") {
@@ -907,9 +917,9 @@
 
         d3.select("#title").html(function() {
           if (gender == "Male") {
-            return (percentile - 1) + "% of men your age have shorter commutes than you."
+            return (percentile) + "% of men your age have shorter commutes than you."
           } else if (gender == "Female") {
-            return (percentile - 1) + "% of women your age have shorter commutes than you."
+            return (percentile) + "% of women your age have shorter commutes than you."
           }
         })
 
@@ -931,6 +941,7 @@
           .attr('transform', 'translate(0,' + height / 2 + ')')
 
         sides.append('text')
+          .attr('x',5)
           .attr('y', function(d) {
             if (d.gender == "Male") {
               return -height / 4
@@ -1063,7 +1074,7 @@
           .ease(d3.easeLinear)
           .tween('updateAnno', function(d, i) {
             xTrans = d3.interpolateNumber(0, commuteTime)
-            timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"), new Date(new Date("January 01, 2019 00:00:00").getTime() + commuteTime * 60000))
+            timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"), new Date(new Date("January 01, 2019 00:00:00").getTime() + commuteTimeReal * 60000))
 
             return function(t) {
               annotations[i].x = x(xTrans(t));
@@ -1074,7 +1085,7 @@
           })
 
         d3.selectAll(".averageLine").transition()
-          .delay(commuteTime * 80)
+          .delay(commuteTime * 40+500)
           .transition()
           .style('opacity', 1)
           .attr('stroke-dasharray', '4 4')
@@ -1118,9 +1129,9 @@
             return +d.ageMin <= age && +d.ageMax > age
           })
 
-        console.log(myIncomeData)
+        console.log('myIncomeData', myIncomeData)
         var myDistribution = createDistribution(myIncomeData)
-        console.log(myDistribution)
+        console.log('income distributions',myDistribution)
 
         incomePercentile = myDistribution.filter(function(d) {
           return d.Gender == gender
@@ -1182,11 +1193,22 @@
           d.circles = dummy;
         })
 
+        console.log('income histos',histos)
+
         incomeCircleIndex = histos.filter(function(d) {
           return d.gender == gender
         })[0].values.findIndex(function(d) {
           return d.x0 > income
         })
+
+        console.log(incomeCircleIndex)
+        if(income>59.4){
+          incomeCircleIndex=100
+          incomeReal=income
+          income=60
+        } else {
+          incomeReal=income
+        }
 
         var radius = x(x.domain()[1] / 100) * 0.45
 
@@ -1276,9 +1298,9 @@
 
         d3.select("#title").html(function() {
           if (gender == "Male") {
-            return "You earn more than " + (incomePercentile - 1) + "% of men around your age who do a similar commute"
+            return "You earn more than " + (incomePercentile) + "% of men around your age who do a similar commute"
           } else if (gender == "Female") {
-            return "You earn more than " + (incomePercentile - 1) + "% of women around your age who do a similar commute"
+            return "You earn more than " + (incomePercentile) + "% of women around your age who do a similar commute"
           }
         })
 
@@ -1314,7 +1336,7 @@
           .tween('updateAnno', function(d) {
             var xTrans = d3.interpolateNumber(annotations[0].x, x(income))
             var yTrans = d3.interpolateNumber(0, height / 2 + incomeCircleHeight)
-            var incomeTrans = d3.interpolateNumber(0, income)
+            var incomeTrans = d3.interpolateNumber(0, incomeReal)
 
             return function(t) {
               annotations[0].x = xTrans(t);
