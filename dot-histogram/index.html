@@ -1145,7 +1145,9 @@
 
         console.log('incomePercentile', incomePercentile)
 
-        var incomeXMax = d3.max([myIncomeData[0]["D10"], myIncomeData[1]["D10"]])
+        var incomeXMax = d3.max([+myIncomeData[0]["D10"], +myIncomeData[1]["D10"]])
+
+        console.log(incomeXMax)
 
         x.range([0, 0])
         d3.select('.x').transition().duration(750).call(d3.axisBottom(x))
@@ -1205,7 +1207,6 @@
           return d.x0 > income
         })
 
-        console.log(incomeCircleIndex)
         if (income > 59.4) {
           incomeCircleIndex = 100
           incomeReal = income
