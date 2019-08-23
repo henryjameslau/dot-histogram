@@ -1122,6 +1122,9 @@
         }
 
 
+        //fix for max age
+        if(age===65){age=64}
+
         d3.selectAll(".averageLine").transition()
           .style('opacity', 0)
 
@@ -1339,10 +1342,13 @@
 
         annotations[0].dx = x(income) < chart_width / 2 ? 80 : -80
         if(gender=="Male"){
-          annotations[0].dy = +incomeCircleHeight
-        }else{
-          annotations[0].dy = -incomeCircleHeight
+          annotations[0].dy = -4 * radius
+        }else if(gender=="Female"){
+          annotations[0].dy = 4 * radius
         }
+
+        // annotations[0].dy = -incomeCircleHeight
+
 
 
         annotations.push({
