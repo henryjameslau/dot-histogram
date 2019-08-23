@@ -77,7 +77,6 @@
       position: relative;
       color: #fff;
       font-size: 1.3em !important;
-      border-radius: 0px;
       text-rendering: optimizeLegibility;
       transition: background-color .2s ease-in, color .2s ease-in;
       font-family: "Open Sans", Helvetica, Arial, sans-serif;
@@ -106,14 +105,14 @@
       user-select: none;
       background-image: none;
       border: 1px solid transparent;
-      border-radius: 4px;
+      border-radius: 0px;
     }
 
     .btn--select {
       color: #206095;
       border: 2px solid #206095;
       margin-left: 0px;
-      margin-right: 15px;
+      /* margin-right: 15px; */
       transition: all ease .2s;
       /* border-radius: 30px !important; */
     }
@@ -141,6 +140,13 @@
       font-weight: 900;
       content: "\f2f9";
       margin-left: 10px;
+    }
+
+    .btn--previous::before {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      content: "\f053";
+      margin-right: 10px;
     }
 
     data-toggle="buttons"]>.btn input[type="checkbox"],
@@ -238,10 +244,11 @@
       }
     }
 
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-       input[type=number] {
-            padding: 5px 0 0 0;
-       }
+    @media screen and (-ms-high-contrast: active),
+    (-ms-high-contrast: none) {
+      input[type=number] {
+        padding: 5px 0 0 0;
+      }
     }
 
     input::-webkit-outer-spin-button,
@@ -314,7 +321,6 @@
       line-height: inherit;
       color: #333;
       border: 0;
-      border-bottom: 1px solid #e5e5e5;
       margin: 20px 0 10px 0;
     }
 
@@ -418,12 +424,16 @@
     .btn--next::after {
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
-      content: "\f054";
+      content: "\f0da";
       margin-left: 10px;
     }
 
     path.note-line {
       opacity: 0
+    }
+
+    .annotation-note-bg{
+      fill-opacity:0.5
     }
 
     .averageLine {
@@ -514,7 +524,7 @@
 
         <hr>
         <div style="padding-top:20px;">
-          <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Start</button>
+          <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Compare my commute</button>
         </div>
 
 
@@ -537,10 +547,12 @@
       </div>
       <h6 id="source">Source: Office for National Statistics</h6>
 
-      <div id="bottomText">Click next to compare the earnings of people who do a similar commute to you.</div>
-      <button class="btn btn--primary btn--next" id="incomeButton" type="button">Next</button>
+      <div id="bottomText">Click to compare your earnings with others of your age who do a similar commute.</div>
+      <button class="btn btn--primary btn--previous " id="backButton" type="button" style="margin-bottom:4px;">Back</button>
 
-      <button class="btn btn--primary btn--primary-disabled btn--restart" id="restart">Restart</button>
+      <button class="btn btn--primary btn--next" id="incomeButton" type="button" style="float:right;">Compare my earnings</button>
+
+      <button class="btn btn--primary btn--restart d-none" id="restart">Restart</button>
     </div>
   </div>
 
@@ -549,8 +561,7 @@
   <script src="https://cdn.ons.gov.uk/vendor/d3/4.13.0/d3.min.js" type="text/javascript"></script>
   <script src="https://cdn.ons.gov.uk/vendor/pym/1.3.2/pym.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.js" type="text/javascript"></script>
-  <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <!-- <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script> -->
 
   <script>
     var graphic = d3.select('#graphic');
@@ -577,8 +588,9 @@
       .data([
         document.getElementById('age').getBoundingClientRect().top + document.getElementById('age').getBoundingClientRect().height / 2, document.getElementById('genderbuttons').getBoundingClientRect().top + document.getElementById('genderbuttons')
         .getBoundingClientRect().height / 2 - 4,
-        document.getElementById('commuteTimeInput').getBoundingClientRect().top + document.getElementById('commuteTimeInput').getBoundingClientRect().height / 2,
-        document.getElementById('income').getBoundingClientRect().top + document.getElementById('income').getBoundingClientRect().height / 2
+        document.getElementById('commuteTimeInput').getBoundingClientRect().top + document.getElementById('commuteTimeInput').getBoundingClientRect().height / 2
+        //,
+        //document.getElementById('income').getBoundingClientRect().top + document.getElementById('income').getBoundingClientRect().height / 2
       ])
       .enter()
       .append('circle')
@@ -589,6 +601,24 @@
       .attr('r', 10).style('fill', 'white')
       .style('stroke', 'grey')
       .style('stroke-width', 2)
+
+    //svg icon
+    icon = timeline.append('g')
+      .attr('transform', 'translate(' + ((timelineWidth / 2) - 14) + ',' + (document.getElementById('income').getBoundingClientRect().top - 39 + document.getElementById('income').getBoundingClientRect().height) + ')')
+
+
+    icon.append('path')
+      .attr('d', "M27.91,14c0,12.07-12.77,24.94-14,24.94S0,26,0,14a14,14,0,0,1,27.91,0Z")
+      .style('fill', "#5f7682")
+
+    icon.append('circle').attr('cx', 13.95).attr('cy', 13.95).attr('r', 11.77).style('fill', "#fff")
+
+    icon.append('path')
+      .attr('d',
+        "M20.78,20.32V6.88a.38.38,0,0,0-.39-.39H13.08a.38.38,0,0,0-.39.39V20.32H12V12.61a.4.4,0,0,0-.39-.39H7.46a.39.39,0,0,0-.38.39v7.71H6.36v1.1H21.55v-1.1ZM9.92,13.19h1.27v1.27H9.92Zm0,2.09h1.27v1.27H9.92Zm-2-2.09H9.2v1.27H7.93Zm0,2.09H9.2v1.27H7.93ZM18.34,8.07h1.52V9.59H18.34Zm0,2.49h1.52v1.51H18.34Zm0,2.48h1.52v1.51H18.34Zm0,2.48h1.52V17H18.34ZM16,8.07h1.51V9.59H16Zm0,2.49h1.51v1.51H16ZM16,13h1.51v1.51H16Zm0,2.48h1.51V17H16ZM13.61,8.07h1.51V9.59H13.61Zm0,2.49h1.51v1.51H13.61Zm0,2.48h1.51v1.51H13.61Zm0,2.48h1.51V17H13.61Zm2.22,2.69h1.81v2.11H15.83Z"
+      )
+      .style('fill', "#5f7682")
+
 
     //button group
     d3.selectAll('.btn--select').on('click', function(d) {
@@ -651,6 +681,7 @@
         };
         var chart_width = parseInt(row.style("width")) - margin.left - margin.right;
         var height = Math.ceil((chart_width * dvc.optional.aspectRatio_sm[1]) / dvc.optional.aspectRatio_sm[0]) - margin.top - margin.bottom;
+        var tickNumber = dvc.optional.tickNumbers_s_m_l[0]
       } else if (parseInt(row.style("width")) < threshold_md) {
         var margin = {
           top: dvc.optional.margin_md[0],
@@ -660,6 +691,8 @@
         };
         var chart_width = parseInt(row.style("width")) - margin.left - margin.right;
         var height = Math.ceil((chart_width * dvc.optional.aspectRatio_md[1]) / dvc.optional.aspectRatio_md[0]) - margin.top - margin.bottom;
+        var tickNumber = dvc.optional.tickNumbers_s_m_l[1]
+
       } else {
         var margin = {
           top: dvc.optional.margin_lg[0],
@@ -669,6 +702,8 @@
         };
         var chart_width = parseInt(row.style("width")) - margin.left - margin.right;
         var height = Math.ceil((chart_width * dvc.optional.aspectRatio_lg[1]) / dvc.optional.aspectRatio_lg[0]) - margin.top - margin.bottom;
+        var tickNumber = dvc.optional.tickNumbers_s_m_l[2]
+
       }
 
       var legend = graphic.append('svg')
@@ -688,26 +723,27 @@
 
       var range = function range(from, to, step) {
         return Array(~~((to - from) / step) + 1) // '~~' is Alternative for Math.floor()
-        .fill().map(function (v, i) {
-          return from + i * step;
-        });
+          .fill().map(function(v, i) {
+            return from + i * step;
+          });
       };
-
-
-
 
 
       //set up functions on buttons
       d3.select('#startButton').on('click', function() {
         checkInputs()
-        //grab values
       })
 
       d3.select('#incomeButton').on('click', function() {
         incomeButton()
       })
 
+      d3.select('#backButton').on('click',function(){
+        backButton()
+      })
+
       function checkInputs() {
+        //grab values
         gendercheck = document.querySelector('input[name="gender"]:checked');
         age = +document.getElementById('age').value
         commuteTime = +document.getElementById('commuteTimeInput').value
@@ -732,20 +768,36 @@
 
       }
 
+      function backButton(){
+        d3.select("#part1").classed('d-none', false)
+        d3.select("#part2").classed('d-none', true)
+        d3.select('#incomeButton').on('click', null)
+      }
+
       function incomeButton() {
         byIncome()
-        d3.select('#incomeButton').classed("btn--primary-disabled", true)
+
+        // d3.select('#incomeButton').classed("btn--primary-disabled", true)
+        d3.select('#incomeButton').classed("d-none", true)
+        d3.select('#backButton').classed("d-none", true)
+
         d3.select("#bottomText").classed('d-none', true)
         d3.select("#incomeButton").on('click', null)
-        d3.select("#restart").classed("btn--primary-disabled", false)
+
+        d3.select('#restart').classed('d-none',false)
+        // d3.select("#restart").classed("btn--primary-disabled", false)
         d3.select("#restart").on('click', function() {
           restart()
         })
       }
 
       function restart() {
-        d3.select('#incomeButton').classed("btn--primary-disabled", false)
-        d3.select("#restart").classed("btn--primary-disabled", true)
+        // d3.select('#incomeButton').classed("btn--primary-disabled", false)
+        // d3.select("#restart").classed("btn--primary-disabled", true)
+        d3.select('#restart').classed('d-none',true)
+
+        d3.select('#incomeButton').classed("d-none", false)
+        d3.select('#backButton').classed("d-none", false)
         d3.select("#part1").classed('d-none', false)
         d3.select("#part2").classed('d-none', true)
         d3.select("#restart").on('click', null)
@@ -773,7 +825,9 @@
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
         x.domain([0, 90]).nice();
 
-        if(commuteTime>xMax){percentile=100}
+        if (commuteTime > xMax) {
+          percentile = 100
+        }
 
         console.log("percentile", percentile)
 
@@ -806,7 +860,8 @@
               return d
             }
           })
-          .tickSize(-height);
+          .tickSize(-height)
+          .ticks(tickNumber);
 
         histos.forEach(function(d) {
           var dummy = [];
@@ -1056,14 +1111,14 @@
 
         timePeriod = document.getElementById('timePeriod').options[document.getElementById('timePeriod').selectedIndex].value
 
-        if(timePeriod=='byYear'){
+        if (timePeriod == 'byYear') {
           xAxisLabel.transition().text("£ per year")
-          fmt=",.0f"
-          annotationLabel=" per year"
+          fmt = ",.0f"
+          annotationLabel = " per year"
         } else {
           xAxisLabel.transition().text("£ per hour")
-          fmt=",.2f"
-          annotationLabel=" per hour"
+          fmt = ",.2f"
+          annotationLabel = " per hour"
         }
 
 
@@ -1091,20 +1146,20 @@
           })
 
 
-        console.log(myIncomeData,income_data)
+        console.log(myIncomeData, income_data)
         //find commute time band
 
 
-        if(commuteTime>119){
-          var myIncomeData=[].concat(income_data.filter(function(d) {
+        if (commuteTime > 119) {
+          var myIncomeData = [].concat(income_data.filter(function(d) {
               return +d.commuteMin >= 120
             })
             .filter(function(d) {
               return +d.ageMin <= age && +d.ageMax > age
             })
           )
-        }else{
-          var myIncomeData=[].concat(income_data.filter(function(d) {
+        } else {
+          var myIncomeData = [].concat(income_data.filter(function(d) {
               return +d.commuteMin <= commuteTime && +d.commuteMax > commuteTime
             })
             .filter(function(d) {
@@ -1113,24 +1168,25 @@
           )
         }
 
-        console.log('myIncomeData',myIncomeData)
+        console.log('myIncomeData', myIncomeData)
         //convert data to per year
-        if(timePeriod=="byYear"){
-          myIncomeDataTimePeriod = myIncomeData.map(function(d){
+        if (timePeriod == "byYear") {
+          myIncomeDataTimePeriod = myIncomeData.map(function(d) {
             var dummy = {}
-              for(var key in d){
-                if(key=="Sex"||key=="ageMin"||key=="ageMax"||key=="commuteMin"||key=="commuteMax") {dummy[key]=d[key]}
-                else {
-                  dummy[key]=d[key]*1724.2
-                }
+            for (var key in d) {
+              if (key == "Sex" || key == "ageMin" || key == "ageMax" || key == "commuteMin" || key == "commuteMax") {
+                dummy[key] = d[key]
+              } else {
+                dummy[key] = d[key] * 1724.2
               }
+            }
             return dummy
           })
-        }else{
+        } else {
           myIncomeDataTimePeriod = myIncomeData
         }
 
-        myDistribution=[];
+        myDistribution = [];
         console.log('myIncomeDataTimePeriod', myIncomeDataTimePeriod)
         var myDistribution = createDistribution(myIncomeDataTimePeriod)
         console.log('income distributions', myDistribution)
@@ -1144,24 +1200,26 @@
 
         var incomeXMax = d3.max([+myIncomeDataTimePeriod[0]["D10"], +myIncomeDataTimePeriod[1]["D10"]])
 
-        if(income>incomeXMax){incomePercentile=100}
+        if (income > incomeXMax) {
+          incomePercentile = 100
+        }
 
         console.log('incomePercentile', incomePercentile)
 
-        console.log('incomemax',incomeXMax)
+        console.log('incomemax', incomeXMax)
 
         x.range([0, 0])
         d3.select('.x').transition().duration(750).call(d3.axisBottom(x))
 
         x.range([0, chart_width])
 
-        if(timePeriod=='byYear'){
-          x.domain([0,100000])
-        }else{
-          x.domain([0,60])
+        if (timePeriod == 'byYear') {
+          x.domain([0, 100000])
+        } else {
+          x.domain([0, 60])
         }
 
-        console.log('xdomain',x.domain())
+        console.log('xdomain', x.domain())
 
         d3.select('.x')
           .transition()
@@ -1174,7 +1232,9 @@
                 return d3.format(fmt)(d)
               }
             })
-            .tickSize(-height))
+            .tickSize(-height)
+            .ticks(tickNumber)
+          )
 
         var histos = myDistribution.map(function(d) {
           var thisHisto = d3.histogram()
@@ -1182,7 +1242,7 @@
               return d
             })
             .domain([0, incomeXMax])
-            .thresholds(range(x.domain()[0], x.domain()[1], x.domain()[1]/100))
+            .thresholds(range(x.domain()[0], x.domain()[1], x.domain()[1] / 100))
 
           return {
             gender: d.Gender,
@@ -1215,7 +1275,7 @@
         })
 
         //catch errors where income is bigger than end of scale
-        if(timePeriod=='byYear'){
+        if (timePeriod == 'byYear') {
           if (income > 100000) {
             incomeCircleIndex = 101
             incomeReal = income
@@ -1223,7 +1283,7 @@
           } else {
             incomeReal = income
           }
-        }else{
+        } else {
           if (income > 59.4) {
             incomeCircleIndex = 100
             incomeReal = income
@@ -1278,12 +1338,16 @@
         annotations.pop()
 
         annotations[0].dx = x(income) < chart_width / 2 ? 80 : -80
-
+        if(gender=="Male"){
+          annotations[0].dy = +incomeCircleHeight
+        }else{
+          annotations[0].dy = -incomeCircleHeight
+        }
 
 
         annotations.push({
           note: {
-            label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome/10)*10) + annotationLabel,
+            label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a woman with a similar age and commute",
             wrap: 250
           },
@@ -1301,7 +1365,7 @@
         })
         annotations.push({
           note: {
-            label: "£" + d3.format(fmt)(Math.round(maleAverageIncome/10)*10) + annotationLabel,
+            label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a man with a similar age and commute",
             wrap: 250
           },
@@ -1377,11 +1441,8 @@
           .transition()
           .delay(3000)
           .style('opacity', 1)
-
-
-
       } // end by income
-
+      pymChild.sendHeight();
     } // ends drawGraphic
 
 
