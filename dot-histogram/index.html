@@ -686,9 +686,12 @@
       x = d3.scaleLinear()
         .rangeRound([0, chart_width]);
 
-      const range = (from, to, step) =>
-        Array(~~((to - from) / step) + 1) // '~~' is Alternative for Math.floor()
-        .fill().map((v, i) => from + i * step);
+      var range = function range(from, to, step) {
+        return Array(~~((to - from) / step) + 1) // '~~' is Alternative for Math.floor()
+        .fill().map(function (v, i) {
+          return from + i * step;
+        });
+      };
 
 
 
