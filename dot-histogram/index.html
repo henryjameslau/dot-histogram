@@ -663,7 +663,6 @@
 
     function drawGraphic(width) {
 
-
       // clear out existing graphics
       graphic.selectAll("*").remove();
       source.selectAll("*").remove();
@@ -772,6 +771,7 @@
         d3.select("#part1").classed('d-none', false)
         d3.select("#part2").classed('d-none', true)
         d3.select('#incomeButton').on('click', null)
+        pymChild.sendHeight()
       }
 
       function incomeButton() {
@@ -789,6 +789,7 @@
         d3.select("#restart").on('click', function() {
           restart()
         })
+        
       }
 
       function restart() {
@@ -802,11 +803,15 @@
         d3.select("#part2").classed('d-none', true)
         d3.select("#restart").on('click', null)
         d3.select("#bottomText").classed('d-none', false)
+        pymChild.sendHeight();
+
       }
 
 
 
       function byAge(age, gender, commuteTime) {
+        pymChild.sendHeight();
+
         svg.selectAll("*").remove();
         myAgeData = graphic_data.filter(function(d) {
           return +d.Age === +age
@@ -1101,11 +1106,14 @@
           .style('opacity', 1)
           .attr('stroke-dasharray', '4 4')
 
+          pymChild.sendHeight();
 
       } //end of byAge
 
 
       function byIncome() {
+        pymChild.sendHeight();
+
         console.log('Income button')
         console.log(income, age, commuteTime)
 
@@ -1447,6 +1455,9 @@
           .transition()
           .delay(3000)
           .style('opacity', 1)
+
+          pymChild.sendHeight();
+
       } // end by income
       pymChild.sendHeight();
     } // ends drawGraphic
@@ -1514,9 +1525,8 @@
       graphic_data = results[0];
       income_data = results[1];
 
-      pymChild = new pym.Child({
-        renderCallback: drawGraphic
-      });
+      pymChild = new pym.Child();
+      drawGraphic();
     }
 
     //check whether browser can cope with svg
@@ -1532,6 +1542,7 @@
         })
         q.awaitAll(loadData)
       })
+
 
     } else {
       //use pym to create iframe containing fallback image (which is set as default)
