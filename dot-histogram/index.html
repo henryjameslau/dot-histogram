@@ -3,7 +3,8 @@
 
 <head>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='ext/css'>
-  <title></title>
+  <title>Commuting Gap Calculator</title>
+
 
   <meta name="description" content="">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -29,9 +30,9 @@
       padding-top: 0;
     }
 
-    h4 {
+    h3 {
       background-color: #206095;
-      font-size: 16px;
+      font-size: 18px;
       line-height: 24px;
       margin: 16px 0 8px 0;
       padding: 15px 10px;
@@ -432,8 +433,8 @@
       opacity: 0
     }
 
-    .annotation-note-bg{
-      fill-opacity:0.5
+    .annotation-note-bg {
+      fill-opacity: 0.5
     }
 
     .averageLine {
@@ -459,6 +460,11 @@
       margin-top: 10px;
       padding: 13px;
       border: solid 3px #D32F2F;
+    }
+
+    #part2{
+
+      padding-bottom: 12px;
     }
   </style>
 
@@ -539,7 +545,7 @@
 
     <div id="part2" class="d-none">
       <div id="chart-titles">
-        <h4 id="title"></h4>
+        <h3 id="title"></h3>
         <h5 id="subtitle"></h5>
       </div>
       <div id="graphic">
@@ -548,9 +554,11 @@
       <h6 id="source">Source: Office for National Statistics</h6>
 
       <div id="bottomText">Click to compare your earnings with others of your age who do a similar commute.</div>
+      <button class="btn btn--primary btn--next" id="incomeButton" type="button" style="float:right;">Compare my earnings</button>
+
       <button class="btn btn--primary btn--previous " id="backButton" type="button" style="margin-bottom:4px;">Back</button>
 
-      <button class="btn btn--primary btn--next" id="incomeButton" type="button" style="float:right;">Compare my earnings</button>
+
 
       <button class="btn btn--primary btn--restart d-none" id="restart">Restart</button>
     </div>
@@ -737,7 +745,7 @@
         incomeButton()
       })
 
-      d3.select('#backButton').on('click',function(){
+      d3.select('#backButton').on('click', function() {
         backButton()
       })
 
@@ -750,6 +758,8 @@
 
         if (gendercheck == null || age == "" || age == null || commuteTime == "" || commuteTime == null || income == "" || income == null) {
           d3.select("#warning").classed("d-none", false)
+          pymChild.sendHeight()
+
         } else {
           gender = document.querySelector('input[name="gender"]:checked').value;
           d3.select("#warning").classed("d-none", true)
@@ -762,12 +772,11 @@
 
           byAge(age, gender, commuteTime)
           console.log('startButton', age, gender, commuteTime, income)
-
         }
 
       }
 
-      function backButton(){
+      function backButton() {
         d3.select("#part1").classed('d-none', false)
         d3.select("#part2").classed('d-none', true)
         d3.select('#incomeButton').on('click', null)
@@ -784,18 +793,18 @@
         d3.select("#bottomText").classed('d-none', true)
         d3.select("#incomeButton").on('click', null)
 
-        d3.select('#restart').classed('d-none',false)
+        d3.select('#restart').classed('d-none', false)
         // d3.select("#restart").classed("btn--primary-disabled", false)
         d3.select("#restart").on('click', function() {
           restart()
         })
-        
+
       }
 
       function restart() {
         // d3.select('#incomeButton').classed("btn--primary-disabled", false)
         // d3.select("#restart").classed("btn--primary-disabled", true)
-        d3.select('#restart').classed('d-none',true)
+        d3.select('#restart').classed('d-none', true)
 
         d3.select('#incomeButton').classed("d-none", false)
         d3.select('#backButton').classed("d-none", false)
@@ -1106,7 +1115,7 @@
           .style('opacity', 1)
           .attr('stroke-dasharray', '4 4')
 
-          pymChild.sendHeight();
+        pymChild.sendHeight();
 
       } //end of byAge
 
@@ -1131,7 +1140,9 @@
 
 
         //fix for max age
-        if(age===65){age=64}
+        if (age === 65) {
+          age = 64
+        }
 
         d3.selectAll(".averageLine").transition()
           .style('opacity', 0)
@@ -1349,9 +1360,9 @@
         annotations.pop()
 
         annotations[0].dx = x(income) < chart_width / 2 ? 80 : -80
-        if(gender=="Male"){
+        if (gender == "Male") {
           annotations[0].dy = -4 * radius
-        }else if(gender=="Female"){
+        } else if (gender == "Female") {
           annotations[0].dy = 4 * radius
         }
 
@@ -1456,7 +1467,7 @@
           .delay(3000)
           .style('opacity', 1)
 
-          pymChild.sendHeight();
+        pymChild.sendHeight();
 
       } // end by income
       pymChild.sendHeight();
@@ -1596,6 +1607,51 @@
         },
         configurable: true,
         writable: true
+      });
+    }
+
+    if (!Array.prototype.fill) {
+      Object.defineProperty(Array.prototype, 'fill', {
+        value: function(value) {
+
+          // Steps 1-2.
+          if (this == null) {
+            throw new TypeError('this is null or not defined');
+          }
+
+          var O = Object(this);
+
+          // Steps 3-5.
+          var len = O.length >>> 0;
+
+          // Steps 6-7.
+          var start = arguments[1];
+          var relativeStart = start >> 0;
+
+          // Step 8.
+          var k = relativeStart < 0 ?
+            Math.max(len + relativeStart, 0) :
+            Math.min(relativeStart, len);
+
+          // Steps 9-10.
+          var end = arguments[2];
+          var relativeEnd = end === undefined ?
+            len : end >> 0;
+
+          // Step 11.
+          var final = relativeEnd < 0 ?
+            Math.max(len + relativeEnd, 0) :
+            Math.min(relativeEnd, len);
+
+          // Step 12.
+          while (k < final) {
+            O[k] = value;
+            k++;
+          }
+
+          // Step 13.
+          return O;
+        }
       });
     }
   </script>
