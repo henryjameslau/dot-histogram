@@ -25,7 +25,7 @@
 
     h5 {
       font-size: 14px;
-      margin: 0 0 16px 0;
+      margin: 16px 0 0 0;
       font-weight: 400;
       padding-top: 0;
     }
@@ -35,12 +35,12 @@
       font-size: 18px;
       line-height: 24px;
       margin: 16px 0 8px 0;
-      padding: 15px 10px;
+      padding: 15px 15px;
       font-weight: 700;
       color: white;
     }
 
-    #bottomText {
+    /* #bottomText {
       background-color: #eaeaea;
       font-size: 16px;
       line-height: 24px;
@@ -48,7 +48,7 @@
       padding: 15px 10px;
       font-weight: 700;
       color: #206095;
-    }
+    } */
 
     hr {
       border: 0;
@@ -92,7 +92,7 @@
       text-decoration: none;
       line-height: 24px;
       display: inline-block;
-      padding: 6px 12px;
+      padding: 4px 12px;
       margin-bottom: 0;
       line-height: 1.42857143;
       white-space: nowrap;
@@ -143,12 +143,22 @@
       margin-left: 10px;
     }
 
-    .btn--previous::before {
+    /* .btn--previous::before {
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
       content: "\f053";
+      width:10px;
+      content: url("../images/left-arrow.svg");
       margin-right: 10px;
     }
+
+    .btn--next::after {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      margin-right: 10px;
+      content: url("../images/right-arrow.svg");
+      margin-left: 10px;
+    } */
 
     data-toggle="buttons"]>.btn input[type="checkbox"],
     [data-toggle="buttons"]>.btn input[type="radio"],
@@ -228,9 +238,9 @@
       /* border: 2px solid #1b5f97; */
       font-size: 20px;
       line-height: 20px;
-      width: 55px;
+      height: 40px;
       /* margin: 16px 0; */
-      /* padding: 6px 0 6px 0; */
+      padding: 0px 0 3px 0;
       width: 60px;
       text-align: center;
       float: left;
@@ -241,7 +251,7 @@
 
     @-moz-document url-prefix() {
       input[type=number] {
-        padding: 6px 0 6px 0;
+        padding: 0px 0 3px 0;
       }
     }
 
@@ -328,7 +338,7 @@
     button.minus,
     button.plus {
       width: 34px;
-      height: 30px;
+      height: 38px;
       background-color: #1b5f97;
       color: #fff;
       border: 2px solid #1b5f97;
@@ -344,7 +354,7 @@
 
     .borderbox {
       border: 2px solid #1b5f97;
-      height: 34px;
+      height: 40px;
       width: 132px;
       display: inline-block;
     }
@@ -388,7 +398,7 @@
 
     .select {
       position: relative;
-      height: 34px;
+      height: 40px;
       background: white;
       border: none;
       width: 134px;
@@ -396,7 +406,7 @@
     }
 
     .select select {
-      font-size: 1.1em;
+      /* font-size: 1.1em; */
       border: none;
       box-shadow: none;
       border-radius: 0;
@@ -422,13 +432,6 @@
       color: white;
     }
 
-    .btn--next::after {
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      content: "\f0da";
-      margin-left: 10px;
-    }
-
     path.note-line {
       opacity: 0
     }
@@ -444,16 +447,16 @@
     .pound {
       float: left;
       display: inline;
-      height: 30px;
+      height: 36px;
       width: 34px;
       font-size: 21px;
-      background-color: #206095;
+      background-color: #5F7682;
       color: #fff;
       text-align: center;
       float: left;
-      font-weight: 600;
+      font-weight: 700;
       box-sizing: border-box;
-      padding-top: 2px;
+      padding-top: 6px;
     }
 
     .error_message {
@@ -463,8 +466,11 @@
     }
 
     #part2{
-
       padding-bottom: 12px;
+    }
+
+    .icon{
+      max-width: 20px;;
     }
   </style>
 
@@ -512,7 +518,7 @@
 
         <hr>
         <legend>Earnings (before tax)</legend>
-        <div>
+        <div style="padding-bottom:3px;">
           <div class="borderbox" style="float:left;">
             <div class="pound">£</div>
             <input style="width:73%" class="bold" id='income' type="number" name="income" step="0.01" value="8.41" min="0" max="20000000">
@@ -530,7 +536,7 @@
 
         <hr>
         <div style="padding-top:20px;">
-          <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Compare my commute</button>
+          <button id="startButton" type="button" class="btn btn-group__btn btn--primary btn--green btn--next">Compare my commute <img src="../images/right-arrow.svg" height="15.38" alt="" style="margin-left:5px;"></button>
         </div>
 
 
@@ -540,12 +546,16 @@
       </div>
     </div>
     <div id="warning" class="d-none error_message">
-      <p>Have you filled out every field?</p>
+      <p>Please fill in every field</p>
     </div>
 
     <div id="part2" class="d-none">
       <div id="chart-titles">
-        <h3 id="title"></h3>
+        <h3>
+
+            <div><img class="icon" src="../images/commute-time-icon.svg" alt="">&nbsp;<span id="title"></span></div>
+
+        </h3>
         <h5 id="subtitle"></h5>
       </div>
       <div id="graphic">
@@ -553,10 +563,10 @@
       </div>
       <h6 id="source">Source: Office for National Statistics</h6>
 
-      <div id="bottomText">Click to compare your earnings with others of your age who do a similar commute.</div>
-      <button class="btn btn--primary btn--next" id="incomeButton" type="button" style="float:right;">Compare my earnings</button>
+      <!-- <div id="bottomText">Click to compare your earnings with others of your age who do a similar commute.</div> -->
+      <button class="btn btn--primary btn--next" id="incomeButton" type="button" style="float:right;">Compare my earnings <img src="../images/right-arrow.svg" height="15.38" alt="" style="margin-left:5px;"></button>
 
-      <button class="btn btn--primary btn--previous " id="backButton" type="button" style="margin-bottom:4px;">Back</button>
+      <button class="btn btn--primary btn--previous " id="backButton" type="button" style="margin-bottom:4px;"><img src="../images/left-arrow.svg" height="15.38" alt="" style="margin-right:5px;"> Back</button>
 
 
 
@@ -584,8 +594,8 @@
     timeline = d3.select('#timeline').append('svg').attr('height', height).attr('width', timelineWidth)
 
     timeline.append('line')
-      .attr('x1', timelineWidth / 2)
-      .attr('x2', timelineWidth / 2)
+      .attr('x1', 14)
+      .attr('x2', 14)
       .attr('y1', document.getElementById('age').getBoundingClientRect().top + document.getElementById('age').getBoundingClientRect().height / 2)
       .attr('y2', document.getElementById('income').getBoundingClientRect().top + document.getElementById('income').getBoundingClientRect().height / 2)
       .attr('stroke', 'grey')
@@ -605,14 +615,14 @@
       .attr('cy', function(d, i) {
         return d
       })
-      .attr('cx', timelineWidth / 2)
+      .attr('cx', 14)
       .attr('r', 10).style('fill', 'white')
       .style('stroke', 'grey')
       .style('stroke-width', 2)
 
     //svg icon
     icon = timeline.append('g')
-      .attr('transform', 'translate(' + ((timelineWidth / 2) - 14) + ',' + (document.getElementById('income').getBoundingClientRect().top - 39 + document.getElementById('income').getBoundingClientRect().height) + ')')
+      .attr('transform', 'translate(' +0 + ',' + (document.getElementById('income').getBoundingClientRect().top - 14 + document.getElementById('income').getBoundingClientRect().height/2) + ')')
 
 
     icon.append('path')
@@ -621,11 +631,11 @@
 
     icon.append('circle').attr('cx', 13.95).attr('cy', 13.95).attr('r', 11.77).style('fill', "#fff")
 
-    icon.append('path')
-      .attr('d',
-        "M20.78,20.32V6.88a.38.38,0,0,0-.39-.39H13.08a.38.38,0,0,0-.39.39V20.32H12V12.61a.4.4,0,0,0-.39-.39H7.46a.39.39,0,0,0-.38.39v7.71H6.36v1.1H21.55v-1.1ZM9.92,13.19h1.27v1.27H9.92Zm0,2.09h1.27v1.27H9.92Zm-2-2.09H9.2v1.27H7.93Zm0,2.09H9.2v1.27H7.93ZM18.34,8.07h1.52V9.59H18.34Zm0,2.49h1.52v1.51H18.34Zm0,2.48h1.52v1.51H18.34Zm0,2.48h1.52V17H18.34ZM16,8.07h1.51V9.59H16Zm0,2.49h1.51v1.51H16ZM16,13h1.51v1.51H16Zm0,2.48h1.51V17H16ZM13.61,8.07h1.51V9.59H13.61Zm0,2.49h1.51v1.51H13.61Zm0,2.48h1.51v1.51H13.61Zm0,2.48h1.51V17H13.61Zm2.22,2.69h1.81v2.11H15.83Z"
-      )
-      .style('fill', "#5f7682")
+    // icon.append('path')
+    //   .attr('d',
+    //     "M20.78,20.32V6.88a.38.38,0,0,0-.39-.39H13.08a.38.38,0,0,0-.39.39V20.32H12V12.61a.4.4,0,0,0-.39-.39H7.46a.39.39,0,0,0-.38.39v7.71H6.36v1.1H21.55v-1.1ZM9.92,13.19h1.27v1.27H9.92Zm0,2.09h1.27v1.27H9.92Zm-2-2.09H9.2v1.27H7.93Zm0,2.09H9.2v1.27H7.93ZM18.34,8.07h1.52V9.59H18.34Zm0,2.49h1.52v1.51H18.34Zm0,2.48h1.52v1.51H18.34Zm0,2.48h1.52V17H18.34ZM16,8.07h1.51V9.59H16Zm0,2.49h1.51v1.51H16ZM16,13h1.51v1.51H16Zm0,2.48h1.51V17H16ZM13.61,8.07h1.51V9.59H13.61Zm0,2.49h1.51v1.51H13.61Zm0,2.48h1.51v1.51H13.61Zm0,2.48h1.51V17H13.61Zm2.22,2.69h1.81v2.11H15.83Z"
+    //   )
+    //   .style('fill', "#5f7682")
 
 
     //button group
@@ -790,7 +800,7 @@
         d3.select('#incomeButton').classed("d-none", true)
         d3.select('#backButton').classed("d-none", true)
 
-        d3.select("#bottomText").classed('d-none', true)
+        // d3.select("#bottomText").classed('d-none', true)
         d3.select("#incomeButton").on('click', null)
 
         d3.select('#restart').classed('d-none', false)
@@ -811,7 +821,7 @@
         d3.select("#part1").classed('d-none', false)
         d3.select("#part2").classed('d-none', true)
         d3.select("#restart").on('click', null)
-        d3.select("#bottomText").classed('d-none', false)
+        // d3.select("#bottomText").classed('d-none', false)
         pymChild.sendHeight();
 
       }
@@ -1033,7 +1043,9 @@
         annotations = [{
           note: {
             label: "00:00",
-            title: "You"
+            title: "You",
+            "align":"middle",
+            "lineType":"vertical"
           },
           x: x(0),
           y: (height / 2) + circleHeight,
@@ -1041,7 +1053,8 @@
           dx: x(commuteTime) < chart_width / 2 ? 40 : -40,
           color: "#323132",
           connector: {
-            "end": "arrow"
+            "end": "arrow",
+            "type":"line",
           },
           subject: {
             radius: radius,
@@ -1373,8 +1386,8 @@
         annotations.push({
           note: {
             label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a woman with a similar age and commute",
-            wrap: 250
+            title: "Average earnings for a woman around your age with a similar commute",
+            wrap: chart_width-x(femaleAverageIncome)
           },
           x: x(femaleAverageIncome),
           y: height,
@@ -1391,8 +1404,8 @@
         annotations.push({
           note: {
             label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a man with a similar age and commute",
-            wrap: 250
+            title: "Average earnings for a man around your age with a similar commute",
+            wrap: chart_width-x(maleAverageIncome)
           },
           x: x(maleAverageIncome),
           y: 1,
