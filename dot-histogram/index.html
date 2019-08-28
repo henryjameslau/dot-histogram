@@ -1468,14 +1468,14 @@
         annotations.push({
           note: {
             label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a woman around your age with a similar commute",
-            wrap: chart_width,
+            title: "Average earnings for a female commuter like you",
+            wrap: chart_width-x(femaleAverageIncome),
             align:"left"
           },
           x: x(femaleAverageIncome),
           y: height,
           dy: -1,
-          dx: -x(femaleAverageIncome),
+          dx: 10,
           className: 'averageLine',
           subject: {
             y1: height-30,
@@ -1487,15 +1487,15 @@
         annotations.push({
           note: {
             label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a man around your age with a similar commute",
-            wrap: chart_width,
+            title: "Average earnings for a male commuter like you",
+            wrap: chart_width-x(maleAverageIncome),
             align:"left"
 
           },
           x: x(maleAverageIncome),
           y: 1,
           dy: 0,
-          dx: -x(maleAverageIncome),
+          dx: 10,
           className: 'averageLine',
           subject: {
             y1: 30,
