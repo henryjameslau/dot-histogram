@@ -34,7 +34,7 @@
       background-color: #206095;
       font-size: 18px;
       line-height: 24px;
-      margin: 16px 0 8px 0;
+      /* margin: 16px 0 8px 0; */
       padding: 15px 15px;
       font-weight: 700;
       color: white;
@@ -465,12 +465,37 @@
       border: solid 3px #D32F2F;
     }
 
-    #part2{
+    #part2 {
       padding-bottom: 12px;
     }
 
-    .icon{
-      max-width: 20px;
+    .icon {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      max-width: 50px;
+    }
+
+    #chart-titles {
+      display: table;
+      width: 100%
+    }
+
+    .blob {
+      display: table-cell;
+    }
+
+    .sidey {
+      position: relative;
+      width: 40px;
+      background-color: #206095;
+      padding-left: 15px;
+    }
+
+    .bigger{
+      font-size: 1.5em;
     }
   </style>
 
@@ -551,13 +576,20 @@
 
     <div id="part2" class="d-none">
       <div id="chart-titles">
-        <h3>
+        <div class="sidey blob">
+          <img class="icon" src="../images/commute-time-icon.svg" alt="">
+        </div>
+        <div class="blob">
+          <h3>
 
-            <div><img class="icon" src="../images/commute-time-icon.svg" alt="">&nbsp;<span id="title"></span></div>
+            <div><span id="preblurb"></span><span class="bigger" id="percentileText"></span><span id="title"></span></div>
 
-        </h3>
-        <h5 id="subtitle"></h5>
+          </h3>
+        </div>
+
+
       </div>
+      <h5 id="subtitle"></h5>
       <div id="graphic">
         <img src="fallback.png" alt="[Chart]" />
       </div>
@@ -622,7 +654,7 @@
 
     //svg icon
     icon = timeline.append('g')
-      .attr('transform', 'translate(' +0 + ',' + (document.getElementById('income').getBoundingClientRect().top - 14 + document.getElementById('income').getBoundingClientRect().height/2) + ')')
+      .attr('transform', 'translate(' + 0 + ',' + (document.getElementById('income').getBoundingClientRect().top - 14 + document.getElementById('income').getBoundingClientRect().height / 2) + ')')
 
 
     icon.append('path')
@@ -814,6 +846,12 @@
       function restart() {
         // d3.select('#incomeButton').classed("btn--primary-disabled", false)
         // d3.select("#restart").classed("btn--primary-disabled", true)
+        //change the icon
+        d3.select('.icon').attr('src',"../images/commute-time-icon.svg")
+        d3.select("#preblurb").html("")
+        d3.select("#title").html("")
+        d3.select("#percentileText").html("")
+
         d3.select('#restart').classed('d-none', true)
 
         d3.select('#incomeButton').classed("d-none", false)
@@ -948,14 +986,19 @@
 
         d3.select("#title").html(function() {
           if (gender == "Male" && commuteTime < yourGenderAverageCommute) {
-            return (percentile) + "% of men your age have shorter commutes than you."
+            return " of men your age have shorter commutes than you."
           } else if (gender == "Male" && commuteTime > yourGenderAverageCommute) {
-            return (100 - percentile) + "% of men your age have longer commutes than you."
+            return " of men your age have longer commutes than you."
           } else if (gender == "Female" && commuteTime > yourGenderAverageCommute) {
-            return (100 - percentile) + "% of women your age have longer commutes than you."
+            return " of women your age have longer commutes than you."
           } else if (gender == "Female" && commuteTime < yourGenderAverageCommute) {
-            return (percentile) + "% of women your age have shorter commutes than you."
+            return " of women your age have shorter commutes than you."
           }
+        })
+
+        d3.select("#percentileText").html(function(){
+          if(commuteTime> yourGenderAverageCommute){return 100-percentile+"%"}
+          else{return percentile+"%"}
         })
 
         d3.select("#subtitle").html("Commute times for people aged " + age + ", Great Britain, 2010 to 2018")
@@ -1044,8 +1087,8 @@
           note: {
             label: "00:00",
             title: "You",
-            "align":"middle",
-            "lineType":"vertical"
+            "align": "middle",
+            "lineType": "vertical"
           },
           x: x(0),
           y: (height / 2) + circleHeight,
@@ -1054,7 +1097,7 @@
           color: "#323132",
           connector: {
             "end": "arrow",
-            "type":"line",
+            "type": "line",
           },
           subject: {
             radius: radius,
@@ -1157,28 +1200,8 @@
           age = 64
         }
 
-        d3.selectAll(".averageLine").transition()
-          .style('opacity', 0)
-
-        sides.selectAll('circle')
-          .transition()
-          .attr('cx', x(commuteTime))
-          .transition()
-          .delay(500)
-          .attr('cy', -height / 2)
-
-        d3.transition()
-          .delay(750)
-          .tween('updateAnno', function(d) {
-            yTrans = d3.interpolateNumber(height / 2, 0)
-
-            return function(t) {
-              annotations[0].y = yTrans(t);
-              annotations[0].note.label = ""
-              makeAnnotations.annotations(annotations)
-              makeAnnotations.update()
-            }
-          })
+        //change the icon
+        d3.select('.icon').attr('src',"../images/earnings-icon.svg")
 
 
         console.log(myIncomeData, income_data)
@@ -1212,7 +1235,7 @@
               if (key == "Sex" || key == "ageMin" || key == "ageMax" || key == "commuteMin" || key == "commuteMax") {
                 dummy[key] = d[key]
               } else {
-                dummy[key] = d[key] * 1724.2
+                dummy[key] = d[key] * 1931.4
               }
             }
             return dummy
@@ -1243,8 +1266,44 @@
 
         console.log('incomemax', incomeXMax)
 
+        d3.selectAll(".averageLine").transition()
+          .style('opacity', 0)
+
+        sides.selectAll('circle')
+          .transition()
+          .attr('cx', function(d, i) {
+            return x(commuteTime + i % 5 - 2)
+          })
+          .transition()
+          .delay(500)
+          .attr('cy', function(d) {
+            if (d.gender == "Male") {
+              return -height / 2
+            } else {
+              return height / 2
+            }
+          })
+
+        d3.transition()
+          .delay(750)
+          .tween('updateAnno', function(d) {
+
+            if (gender == "Male") {
+              yTrans = d3.interpolateNumber(height / 2, 0)
+            } else if (gender == "Female") {
+              yTrans = d3.interpolateNumber(height / 2, height)
+            }
+
+            return function(t) {
+              annotations[0].y = yTrans(t);
+              annotations[0].note.label = ""
+              makeAnnotations.annotations(annotations)
+              makeAnnotations.update()
+            }
+          })
+
         x.range([0, 0])
-        d3.select('.x').transition().duration(750).call(d3.axisBottom(x))
+        d3.select('.x').transition().delay(750).duration(750).call(d3.axisBottom(x))
 
         x.range([0, chart_width])
 
@@ -1258,7 +1317,7 @@
 
         d3.select('.x')
           .transition()
-          .delay(750)
+          .delay(1500)
           .duration(750)
           .call(d3.axisBottom(x).tickFormat(function(d) {
               if (d == x.domain()[1]) {
@@ -1387,7 +1446,7 @@
           note: {
             label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a woman around your age with a similar commute",
-            wrap: chart_width-x(femaleAverageIncome)
+            wrap: chart_width - x(femaleAverageIncome)
           },
           x: x(femaleAverageIncome),
           y: height,
@@ -1405,7 +1464,7 @@
           note: {
             label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a man around your age with a similar commute",
-            wrap: chart_width-x(maleAverageIncome)
+            wrap: chart_width - x(maleAverageIncome)
           },
           x: x(maleAverageIncome),
           y: 1,
@@ -1425,11 +1484,14 @@
 
         d3.select("#title").html(function() {
           if (gender == "Male") {
-            return "You earn more than " + (incomePercentile) + "% of men around your age who do a similar commute"
+            return " of men around your age who do a similar commute"
           } else if (gender == "Female") {
-            return "You earn more than " + (incomePercentile) + "% of women around your age who do a similar commute"
+            return " of women around your age who do a similar commute"
           }
         })
+
+        d3.select("#preblurb").html("You earn more than ")
+        d3.select("#percentileText").html(incomePercentile+"%")
 
         d3.select("#subtitle").html("Hourly earnings for people aged between " + ageMin + " and " + ageMax + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
 
@@ -1441,9 +1503,11 @@
             return d.circles
           })
           .transition()
-          .delay(1500)
+          .delay(2500)
           .ease(d3.easeLinear)
-          .duration(1500)
+          .duration(function(d, i) {
+            return Math.sqrt(i) * 150
+          })
           .attr('cx', function(d) {
             return x(d.x)
           })
@@ -1457,12 +1521,16 @@
           })
 
         d3.transition()
-          .delay(1500)
+          .delay(2500)
           .duration(1500)
           .ease(d3.easeLinear)
           .tween('updateAnno', function(d) {
             var xTrans = d3.interpolateNumber(annotations[0].x, x(income))
-            var yTrans = d3.interpolateNumber(0, height / 2 + incomeCircleHeight)
+            if (gender == 'Female') {
+              var yTrans = d3.interpolateNumber(height, height / 2 + incomeCircleHeight)
+            } else {
+              var yTrans = d3.interpolateNumber(0, height / 2 + incomeCircleHeight)
+            }
             var incomeTrans = d3.interpolateNumber(0, incomeReal)
 
             return function(t) {
