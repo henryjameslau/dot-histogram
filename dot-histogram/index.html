@@ -479,7 +479,7 @@
     }
 
     @-moz-document url-prefix() {
-      .icon{
+      .icon {
         max-width: 50px;
       }
     }
@@ -500,7 +500,7 @@
       padding-left: 15px;
     }
 
-    .bigger{
+    .bigger {
       font-size: 1.5em;
     }
   </style>
@@ -620,12 +620,10 @@
   <!-- <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script> -->
 
   <script>
-    var graphic = d3.select('#graphic');
-    var row = d3.select(".row")
-    var source = d3.select('#source');
+    graphic = d3.select('#graphic');
+    row = d3.select(".row")
+    source = d3.select('#source');
     var pymChild = null;
-
-
 
     height = parseInt(d3.select('#inputs').style('height'))
     timelineWidth = parseInt(d3.select('#timeline').style("width"))
@@ -853,7 +851,7 @@
         // d3.select('#incomeButton').classed("btn--primary-disabled", false)
         // d3.select("#restart").classed("btn--primary-disabled", true)
         //change the icon
-        d3.select('.icon').attr('src',"../images/commute-time-icon.svg")
+        d3.select('.icon').attr('src', "../images/commute-time-icon.svg")
         d3.select("#preblurb").html("")
         d3.select("#title").html("")
         d3.select("#percentileText").html("")
@@ -891,7 +889,12 @@
         })
 
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
-        x.domain([0, 90]).nice();
+
+        if (parseInt(graphic.style("width")) < threshold_md) {
+          x.domain([0, 60]);
+        } else {
+          x.domain([0, 90]);
+        }
 
         if (commuteTime > xMax) {
           percentile = 100
@@ -908,7 +911,7 @@
               return d
             })
             .domain([0, xMax])
-            .thresholds(range(x.domain()[0], 90, 1))
+            .thresholds(range(x.domain()[0], x.domain()[1], 1))
 
           return {
             gender: d.Gender,
@@ -958,10 +961,10 @@
 
         console.log(circleIndex)
 
-        if (commuteTime > 89) {
-          circleIndex = 91
+        if (commuteTime > (x.domain()[1]-1)) {
+          circleIndex = x.domain()[1]+1
           commuteTimeReal = commuteTime
-          commuteTime = 90
+          commuteTime = x.domain()[1]
         } else {
           commuteTimeReal = commuteTime
         }
@@ -1002,9 +1005,12 @@
           }
         })
 
-        d3.select("#percentileText").html(function(){
-          if(commuteTime> yourGenderAverageCommute){return 100-percentile+"%"}
-          else{return percentile+"%"}
+        d3.select("#percentileText").html(function() {
+          if (commuteTime > yourGenderAverageCommute) {
+            return 100 - percentile + "%"
+          } else {
+            return percentile + "%"
+          }
         })
 
         d3.select("#subtitle").html("Commute times for people aged " + age + ", Great Britain, 2010 to 2018")
@@ -1078,8 +1084,6 @@
               return +d.idx * 2 * radius + radius
             }
           })
-
-
 
         xAxisLabel = svg.append('text')
           .text('minutes')
@@ -1207,7 +1211,7 @@
         }
 
         //change the icon
-        d3.select('.icon').attr('src',"../images/earnings-icon.svg")
+        d3.select('.icon').attr('src', "../images/earnings-icon.svg")
 
 
         console.log(myIncomeData, income_data)
@@ -1313,11 +1317,23 @@
 
         x.range([0, chart_width])
 
-        if (timePeriod == 'byYear') {
-          x.domain([0, 100000])
-        } else {
-          x.domain([0, 60])
+        if (parseInt(graphic.style("width")) < threshold_md) {
+          if (timePeriod == 'byYear') {
+            x.domain([0, 600000])
+          } else {
+            x.domain([0, 40])
+          }
         }
+        else{
+          if (timePeriod == 'byYear') {
+            x.domain([0, 100000])
+          } else {
+            x.domain([0, 60])
+          }
+        }
+
+
+
 
         console.log('xdomain', x.domain())
 
@@ -1376,18 +1392,18 @@
 
         //catch errors where income is bigger than end of scale
         if (timePeriod == 'byYear') {
-          if (income > 100000) {
+          if (income > x.domain()[1]) {
             incomeCircleIndex = 101
             incomeReal = income
-            income = 100000
+            income = x.domain()[1]
           } else {
             incomeReal = income
           }
         } else {
-          if (income > 59.4) {
+          if (income > x.domain()[1]-(x.domain()[1]/100)) {
             incomeCircleIndex = 100
             incomeReal = income
-            income = 60
+            income = x.domain()[1]
           } else {
             incomeReal = income
           }
@@ -1497,7 +1513,7 @@
         })
 
         d3.select("#preblurb").html("You earn more than ")
-        d3.select("#percentileText").html(incomePercentile+"%")
+        d3.select("#percentileText").html(incomePercentile + "%")
 
         d3.select("#subtitle").html("Hourly earnings for people aged between " + ageMin + " and " + ageMax + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
 
