@@ -24,7 +24,7 @@
     }
 
     h5 {
-      font-size: 14px;
+      font-size: 16px;
       margin: 16px 0 0 0;
       font-weight: 400;
       padding-top: 0;
@@ -1034,9 +1034,9 @@
           .attr('x', 5)
           .attr('y', function(d) {
             if (d.gender == "Male") {
-              return -height / 4
+              return -height / 6
             } else {
-              return height / 4
+              return height / 6
             }
           })
           .attr('font-weight', 700)
@@ -1116,7 +1116,7 @@
           type: d3.annotationCalloutCircle
         }, {
           note: {
-            label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + femaleAverageCommuteTime * 60000)),
+            label: d3.timeFormat("%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + femaleAverageCommuteTime * 60000))+ " minutes",
             title: "Average commute for a woman your age",
             wrap: chart_width - x(femaleAverageCommuteTime)
           },
@@ -1126,14 +1126,14 @@
           dx: +10,
           className: 'averageLine',
           subject: {
-            y1: height,
+            y1: height-20,
             y2: height / 2
           },
           type: d3.annotationXYThreshold,
           disable: ["connector"]
         }, {
           note: {
-            label: d3.timeFormat("%H:%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000)),
+            label: d3.timeFormat("%M")(new Date(new Date("January 01, 2019 00:00:00").getTime() + maleAverageCommuteTime * 60000))+" minutes",
             title: "Average commute for a man your age",
             wrap: chart_width - x(maleAverageCommuteTime)
           },
@@ -1143,7 +1143,7 @@
           dx: +10,
           className: 'averageLine',
           subject: {
-            y1: 0,
+            y1: 20,
             y2: height / 2
           },
           type: d3.annotationXYThreshold,
@@ -1319,7 +1319,7 @@
 
         if (parseInt(graphic.style("width")) < threshold_md) {
           if (timePeriod == 'byYear') {
-            x.domain([0, 600000])
+            x.domain([0, 60000])
           } else {
             x.domain([0, 40])
           }
@@ -1468,15 +1468,16 @@
           note: {
             label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a woman around your age with a similar commute",
-            wrap: chart_width - x(femaleAverageIncome)
+            wrap: chart_width,
+            align:"left"
           },
           x: x(femaleAverageIncome),
           y: height,
           dy: -1,
-          dx: +10,
+          dx: -x(femaleAverageIncome),
           className: 'averageLine',
           subject: {
-            y1: height,
+            y1: height-30,
             y2: height / 2
           },
           type: d3.annotationXYThreshold,
@@ -1486,15 +1487,17 @@
           note: {
             label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
             title: "Average earnings for a man around your age with a similar commute",
-            wrap: chart_width - x(maleAverageIncome)
+            wrap: chart_width,
+            align:"left"
+
           },
           x: x(maleAverageIncome),
           y: 1,
           dy: 0,
-          dx: +10,
+          dx: -x(maleAverageIncome),
           className: 'averageLine',
           subject: {
-            y1: 0,
+            y1: 30,
             y2: height / 2
           },
           type: d3.annotationXYThreshold,
