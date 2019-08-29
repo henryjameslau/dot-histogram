@@ -1206,7 +1206,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
             return function(t) {
               annotations[i].x = x(xTrans(t));
-              annotations[0].note.label = d3.timeFormat("%H:%M")(timeTrans(t))
+              annotations[0].note.label = d3.timeFormat("%M")(timeTrans(t))+" minutes"
               makeAnnotations.annotations(annotations)
               makeAnnotations.update()
             }
@@ -1510,46 +1510,88 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         // annotations[0].dy = -incomeCircleHeight
 
 
+        if(timePeriod=='byYear'){
+          annotations.push({
+            note: {
+              label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
+              title: "Average earnings for a female commuter like you",
+              wrap: chart_width - x(femaleAverageIncome),
+              align: "left"
+            },
+            x: x(femaleAverageIncome),
+            y: height,
+            dy: -1,
+            dx: 10,
+            className: 'averageLine',
+            subject: {
+              y1: height - 30,
+              y2: height / 2
+            },
+            type: d3.annotationXYThreshold,
+            disable: ["connector"]
+          })
+          annotations.push({
+            note: {
+              label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
+              title: "Average earnings for a male commuter like you",
+              wrap: chart_width - x(maleAverageIncome),
+              align: "left"
 
-        annotations.push({
-          note: {
-            label: "£" + d3.format(fmt)(Math.round(femaleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a female commuter like you",
-            wrap: chart_width - x(femaleAverageIncome),
-            align: "left"
-          },
-          x: x(femaleAverageIncome),
-          y: height,
-          dy: -1,
-          dx: 10,
-          className: 'averageLine',
-          subject: {
-            y1: height - 30,
-            y2: height / 2
-          },
-          type: d3.annotationXYThreshold,
-          disable: ["connector"]
-        })
-        annotations.push({
-          note: {
-            label: "£" + d3.format(fmt)(Math.round(maleAverageIncome / 10) * 10) + annotationLabel,
-            title: "Average earnings for a male commuter like you",
-            wrap: chart_width - x(maleAverageIncome),
-            align: "left"
+            },
+            x: x(maleAverageIncome),
+            y: 1,
+            dy: 0,
+            dx: 10,
+            className: 'averageLine',
+            subject: {
+              y1: 30,
+              y2: height / 2
+            },
+            type: d3.annotationXYThreshold,
+            disable: ["connector"]
+          })
+        }else{
+          annotations.push({
+            note: {
+              label: "£" + d3.format(fmt)(femaleAverageIncome) + annotationLabel,
+              title: "Average earnings for a female commuter like you",
+              wrap: chart_width - x(femaleAverageIncome),
+              align: "left"
+            },
+            x: x(femaleAverageIncome),
+            y: height,
+            dy: -1,
+            dx: 10,
+            className: 'averageLine',
+            subject: {
+              y1: height - 30,
+              y2: height / 2
+            },
+            type: d3.annotationXYThreshold,
+            disable: ["connector"]
+          })
+          annotations.push({
+            note: {
+              label: "£" + d3.format(fmt)(maleAverageIncome) + annotationLabel,
+              title: "Average earnings for a male commuter like you",
+              wrap: chart_width - x(maleAverageIncome),
+              align: "left"
 
-          },
-          x: x(maleAverageIncome),
-          y: 1,
-          dy: 0,
-          dx: 10,
-          className: 'averageLine',
-          subject: {
-            y1: 30,
-            y2: height / 2
-          },
-          type: d3.annotationXYThreshold,
-          disable: ["connector"]
-        })
+            },
+            x: x(maleAverageIncome),
+            y: 1,
+            dy: 0,
+            dx: 10,
+            className: 'averageLine',
+            subject: {
+              y1: 30,
+              y2: height / 2
+            },
+            type: d3.annotationXYThreshold,
+            disable: ["connector"]
+          })
+        }
+
 
         makeAnnotations.annotations(annotations)
         makeAnnotations.update()
