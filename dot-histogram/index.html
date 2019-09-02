@@ -1607,7 +1607,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         d3.select("#preblurb").html("You earn more than ")
         d3.select("#percentileText").html(incomePercentile + "%")
 
-        d3.select("#subtitle").html("Hourly earnings for people aged between " + ageMin + " and " + ageMax + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
+        d3.select("#subtitle").html("Hourly earnings for people aged between " + ageMin + " and " + (ageMax-1) + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
 
         sides = svg.selectAll(".sides")
           .data(histos)
