@@ -465,7 +465,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       float: left;
       font-weight: 700;
       box-sizing: border-box;
-      padding-top: 6px;
+      padding-top: 4px;
     }
 
     .error_message {
@@ -553,7 +553,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </div>
 
         <hr>
-        <legend>Commute time (minutes)</legend>
+        <legend>Commute time in minutes (one-way)</legend>
         <div class="borderbox">
           <button type="button" id="minus2" class="minus"><i class="fas fa-minus white"></i></button>
           <input class="bold" type="number" id="commuteTimeInput" name="commuteTime" value="22" min="1" max="120">
@@ -823,7 +823,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
           dataLayer.push({
             'event': 'mapDropSelect',
-            'selected': gender + ',' + age + ',' + commuteTime + ',' + income
+            'selected': gender + ',' + age + ',' + commuteTime + ',' + income + ',' + document.getElementById('timePeriod').options[document.getElementById('timePeriod').selectedIndex].value
           })
 
           dataLayer.push({
@@ -924,9 +924,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
 
         if (parseInt(graphic.style("width")) < threshold_md) {
-          x.domain([0, 60]);
+          x.domain([0, 50]);
         } else {
-          x.domain([0, 90]);
+          x.domain([0, 80]);
         }
 
         if (commuteTime > xMax) {
@@ -1248,9 +1248,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 
         //fix for max age
-        if (age === 65) {
-          age = 64
-        }
+        // if (age === 65) {
+        //   age = 64
+        // }
 
         //change the icon
         d3.select('.icon').attr('src', "../images/earnings-icon.svg")
@@ -1265,7 +1265,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               return +d.commuteMin >= 120
             })
             .filter(function(d) {
-              return +d.ageMin <= age && +d.ageMax > age
+              return +d.ageMin < age && +d.ageMax >= age
             })
           )
         } else {
@@ -1273,7 +1273,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               return +d.commuteMin <= commuteTime && +d.commuteMax > commuteTime
             })
             .filter(function(d) {
-              return +d.ageMin <= age && +d.ageMax > age
+              return +d.ageMin < age && +d.ageMax >= age
             })
           )
         }
@@ -1297,10 +1297,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
 
         myDistribution = [];
-        // console.log('myIncomeDataTimePeriod', myIncomeDataTimePeriod)
+        console.log('myIncomeDataTimePeriod', myIncomeDataTimePeriod)
         var myDistribution = createDistribution(myIncomeDataTimePeriod)
-        // console.log('income distributions', myDistribution)
 
+        console.log('income distributions',myDistribution)
 
         incomePercentile = myDistribution.filter(function(d) {
           return d.Gender == gender
@@ -1308,20 +1308,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           return d > income
         })
 
+        var incomeXMax = d3.max([+myIncomeDataTimePeriod[0]["D10"], +myIncomeDataTimePeriod[1]["D10"]])
+
+        incomeXMaxForGender = myDistribution.filter(function(d) {
+          return d.Gender == gender
+        })[0].values[myDistribution.filter(function(d) {
+          return d.Gender == gender
+        })[0].values.length-1]
+
+        console.log('income',income)
+        console.log('incomeXMaxForGender',incomeXMaxForGender)
+
+        if (income > incomeXMaxForGender) {
+          incomePercentile = 100
+        }
+
         dataLayer.push({
           'event': 'mapClickSelect',
           'selected': 'earnings,' + incomePercentile
         })
 
-        var incomeXMax = d3.max([+myIncomeDataTimePeriod[0]["D10"], +myIncomeDataTimePeriod[1]["D10"]])
+        console.log('incomePercentile', incomePercentile)
 
-        if (income > incomeXMax) {
-          incomePercentile = 100
-        }
-
-        // console.log('incomePercentile', incomePercentile)
-
-        // console.log('incomemax', incomeXMax)
+        console.log('incomemax', incomeXMax)
 
         d3.selectAll(".averageLine").transition()
           .style('opacity', 0)
@@ -1382,7 +1391,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 
 
-        // console.log('xdomain', x.domain())
+        console.log('xdomain', x.domain())
 
         d3.select('.x')
           .transition()
@@ -1412,7 +1421,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             values: thisHisto(d.values),
           }
         })
-        // console.log(histos)
+        console.log(histos)
+
         var xAxis = d3.axisBottom(x);
 
         histos.forEach(function(d) {
@@ -1429,7 +1439,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           d.circles = dummy;
         })
 
-        // console.log('income histos', histos)
+        console.log('income histos', histos)
 
         incomeCircleIndex = histos.filter(function(d) {
           return d.gender == gender
@@ -1437,9 +1447,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           return d.x0 > income
         })
 
+        console.log('incomeCircleIndex',incomeCircleIndex)
         //catch errors where income is bigger than end of scale
         if (timePeriod == 'byYear') {
-          if (income > x.domain()[1]) {
+          if (income > incomeXMaxForGender) {
             incomeCircleIndex = 101
             incomeReal = income
             income = x.domain()[1]
@@ -1447,8 +1458,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             incomeReal = income
           }
         } else {
-          if (income > x.domain()[1] - (x.domain()[1] / 100)) {
-            incomeCircleIndex = 100
+          if (income > incomeXMaxForGender || income > x.domain()[1]) {
+            incomeCircleIndex = histos.filter(function(d){return d.gender == gender})[0].values.length
             incomeReal = income
             income = x.domain()[1]
           } else {
@@ -1457,6 +1468,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
 
         var radius = x(x.domain()[1] / 100) * 0.45
+
+        console.log(histos, incomeCircleIndex)
 
         if (gender == "Male") {
           incomeCircleHeight = -2 * radius * (histos.filter(function(d) {
@@ -1607,7 +1620,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         d3.select("#preblurb").html("You earn more than ")
         d3.select("#percentileText").html(incomePercentile + "%")
 
-        d3.select("#subtitle").html("Hourly earnings for people aged between " + ageMin + " and " + (ageMax-1) + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
+        d3.select("#subtitle").html("Hourly earnings for people aged between " + (+ageMin+1) + " and " + (ageMax) + " who commute " + commuteMin + "–" + commuteMax + " minutes, Great Britain, 2010 to 2018")
 
         sides = svg.selectAll(".sides")
           .data(histos)
