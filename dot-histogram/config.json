@@ -5,8 +5,8 @@
   },
 
   "optional": {
-    "margin_sm": [10, 35, 40, 10],
-    "margin_md": [10, 35, 40, 20],
+    "margin_sm": [10, 35, 40, 5],
+    "margin_md": [10, 35, 40, 10],
     "margin_lg": [10, 35, 40, 20],
 
     "aspectRatio_sm": [16, 24],
