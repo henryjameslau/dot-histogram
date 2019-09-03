@@ -25,6 +25,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
   <style type="text/css">
+
+
     h6 {
       font-size: 16px;
       margin: 16px 0 8px 0;
@@ -561,7 +563,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </div>
 
         <hr>
-        <legend>Earnings (before tax)</legend>
+        <legend>Earnings (full-time equivalent before tax)</legend>
         <div style="padding-bottom:3px;">
           <div class="borderbox" style="float:left;">
             <div class="pound">£</div>
@@ -926,13 +928,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
         xMax = d3.max([+myAgeData[0]["D10"], +myAgeData[1]["D10"]])
 
+        XMaxForGender = myDistribution.filter(function(d) {
+          return d.Gender == gender
+        })[0].values[myDistribution.filter(function(d) {
+          return d.Gender == gender
+        })[0].values.length-1]
+
         if (parseInt(graphic.style("width")) < threshold_md) {
           x.domain([0, 60]);
         } else {
           x.domain([0, 80]);
         }
 
-        if (commuteTime > xMax) {
+        if (commuteTime > XMaxForGender) {
           percentile = 100
         }
 
@@ -1301,10 +1309,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
 
         myDistribution = [];
-        console.log('myIncomeDataTimePeriod', myIncomeDataTimePeriod)
+        // console.log('myIncomeDataTimePeriod', myIncomeDataTimePeriod)
         var myDistribution = createDistribution(myIncomeDataTimePeriod)
 
-        console.log('income distributions',myDistribution)
+        // console.log('income distributions',myDistribution)
 
         incomePercentile = myDistribution.filter(function(d) {
           return d.Gender == gender
@@ -1322,8 +1330,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           return d.Gender == gender
         })[0].values.length-1]
 
-        console.log('income',income)
-        console.log('incomeXMaxForGender',incomeXMaxForGender)
+        // console.log('income',income)
+        // console.log('incomeXMaxForGender',incomeXMaxForGender)
 
         if (income > incomeXMaxForGender) {
           incomePercentile = 100
@@ -1334,9 +1342,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           'selected': 'earnings,' + incomePercentile
         })
 
-        console.log('incomePercentile', incomePercentile)
-
-        console.log('incomemax', incomeXMax)
+        // console.log('incomePercentile', incomePercentile)
+        //
+        // console.log('incomemax', incomeXMax)
 
         d3.selectAll(".averageLine").transition()
           .style('opacity', 0)
@@ -1397,7 +1405,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 
 
-        console.log('xdomain', x.domain())
+        // console.log('xdomain', x.domain())
 
         d3.select('.x')
           .transition()
@@ -1427,7 +1435,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             values: thisHisto(d.values),
           }
         })
-        console.log(histos)
+        // console.log(histos)
 
         var xAxis = d3.axisBottom(x);
 
@@ -1445,7 +1453,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           d.circles = dummy;
         })
 
-        console.log('income histos', histos)
+        // console.log('income histos', histos)
 
         incomeCircleIndex = histos.filter(function(d) {
           return d.gender == gender
@@ -1453,7 +1461,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           return d.x0 > income
         })
 
-        console.log('incomeCircleIndex',incomeCircleIndex)
+        // console.log('incomeCircleIndex',incomeCircleIndex)
         //catch errors where income is bigger than end of scale
         if (timePeriod == 'byYear') {
           if (income > incomeXMaxForGender) {
@@ -1475,9 +1483,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
         var radius = x(x.domain()[1]) / 100 * 0.45
 
-        console.log(radius)
+        // console.log(radius)
 
-        console.log(histos, incomeCircleIndex)
+        // console.log(histos, incomeCircleIndex)
 
         if (gender == "Male") {
           incomeCircleHeight = -2 * radius * (histos.filter(function(d) {
